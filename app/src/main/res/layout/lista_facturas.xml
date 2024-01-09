@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="17dp"
+    android:layout_marginHorizontal="10dp"
+    android:layout_marginVertical="10dp"
+    app:cardElevation="5dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_marginHorizontal="16dp" >
+
+        <TextView
+            android:id="@+id/tvFechaFactura"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="184dp"
+            android:text="Fecha"
+            android:textSize="20dp"
+            app:layout_constraintBottom_toTopOf="@+id/tvEstadoFactura"
+            app:layout_constraintEnd_toStartOf="@+id/tvPrecioFactura"
+            app:layout_constraintStart_toStartOf="@+id/tvEstadoFactura"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="MissingConstraints"></TextView>
+
+        <TextView
+            android:id="@+id/tvEstadoFactura"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="140dp"
+            android:layout_marginBottom="28dp"
+            android:text="Estado de Pago"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/tvPrecioFactura"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            tools:ignore="MissingConstraints"></TextView>
+
+        <TextView
+            android:id="@+id/tvPrecioFactura"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:layout_marginEnd="12dp"
+            android:text="XX,XX €"
+            android:textSize="18dp"
+            app:layout_constraintBottom_toTopOf="@+id/tvEstadoFactura"
+            app:layout_constraintEnd_toStartOf="@+id/imgFlecha"
+            app:layout_constraintTop_toBottomOf="@+id/tvFechaFactura"
+            app:layout_constraintVertical_bias="0.85"
+            tools:ignore="MissingConstraints"></TextView>
+
+        <ImageView
+            android:id="@+id/imgFlecha"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/baseline_arrow_forward_ios_24"
+            app:layout_constraintBottom_toBottomOf="@+id/tvPrecioFactura"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@+id/tvPrecioFactura"
+            tools:ignore="MissingConstraints"></ImageView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>
