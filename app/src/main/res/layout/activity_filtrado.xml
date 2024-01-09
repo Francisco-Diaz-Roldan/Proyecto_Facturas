@@ -125,6 +125,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="5€ - 250€"
+        android:textColor="@color/green"
         app:layout_constraintEnd_toStartOf="@+id/tvMaxImporte"
         app:layout_constraintStart_toEndOf="@+id/tvMinImporte"
         app:layout_constraintTop_toBottomOf="@+id/tvImporteFactura"
