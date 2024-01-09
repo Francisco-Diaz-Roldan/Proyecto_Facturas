@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace = "com.example.proyecto_facturas"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.example.proyecto_facturas"
