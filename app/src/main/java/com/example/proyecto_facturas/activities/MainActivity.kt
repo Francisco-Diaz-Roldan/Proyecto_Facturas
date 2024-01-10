@@ -1,8 +1,9 @@
-package com.example.proyecto_facturas
+package com.example.proyecto_facturas.activities
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.appcompat.widget.Toolbar
+import com.example.proyecto_facturas.R
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
