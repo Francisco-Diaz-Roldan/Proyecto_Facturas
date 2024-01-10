@@ -37,12 +37,13 @@ class FacturaViewHolder(view: View):RecyclerView.ViewHolder(view){ //TODO hacer 
             val formatoEntrada = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
             val fecha = formatoEntrada.parse(fechaString)
 
-            // Formateo la fecha a "dd MMM yyyy"
-            val formatoSalida = SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
+            // Formateo la fecha a "dd MMM yyyy" en español
+            val formatoSalida = SimpleDateFormat("dd MMM yyyy", Locale("es",
+                "ES"))
             return formatoSalida.format(fecha!!)
         } catch (e: ParseException) {
             e.printStackTrace()
-            return fechaString // Devuelvo la fecha original en caso de error
+            return fechaString // Devuelve la fecha original en caso de error
         }
     }
 }
