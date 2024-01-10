@@ -4,8 +4,10 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
+import android.view.MenuItem
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter
@@ -43,7 +45,7 @@ class MainActivity : AppCompatActivity() {
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        // Puedes modificar el título de la barra de herramientas si es necesario
+        // Modifico el título de la barra de herramientas (toolbar)
         supportActionBar?.title = "Facturas"
     }
 
@@ -53,9 +55,35 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun onItemSelected(factura: Factura) {
-        val intent = Intent(this, FiltradoActivity::class.java)
-        startActivity(intent)
+        mostrarDialogAlerta()
+
     }
 
+    private fun mostrarDialogAlerta() {
+        val builder = AlertDialog.Builder(this)
 
+        // Configuración del diálogo
+        builder.setTitle("Informción")
+        builder.setMessage("Esta funcionalidad aún no está disponible")
+
+        // Botón negativo Cerrar
+        builder.setNegativeButton("Cerrar") { dialog, which -> dialog.dismiss()
+        }
+
+        // Crear y mostrar el diálogo
+        val alertDialog: AlertDialog = builder.create()
+        alertDialog.show()
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.menuFiltrar -> {
+                val intent = Intent(this, FiltradoActivity::class.java)
+                startActivity(intent)
+                return true
+            }
+            // Otros casos según las necesidades
+            else -> return super.onOptionsItemSelected(item)
+        }
+    }
 }

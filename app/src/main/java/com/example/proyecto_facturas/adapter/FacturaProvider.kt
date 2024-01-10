@@ -2,8 +2,7 @@ package com.example.proyecto_facturas.adapter
 
 import com.example.proyecto_facturas.domain.Factura
 
-class FacturaProvider {
-    //TODO hacer con retrofit
+class FacturaProvider { //TODO hacer con retrofit
 
 companion object {
     var listaFacturas = mutableListOf(

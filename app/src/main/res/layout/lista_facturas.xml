@@ -34,6 +34,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="28dp"
             android:text="@string/estado_de_pago"
+            android:textSize="14sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/tvPrecioFactura"
             app:layout_constraintHorizontal_bias="0.099"
@@ -44,12 +45,13 @@
             android:id="@+id/tvPrecioFactura"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
             android:text="XX,XX €"
             android:textSize="18sp"
             app:layout_constraintBottom_toTopOf="@+id/tvEstadoFactura"
             app:layout_constraintEnd_toStartOf="@+id/imgFlecha"
             app:layout_constraintTop_toBottomOf="@+id/tvFechaFactura"
-            app:layout_constraintVertical_bias="0.85"
+            app:layout_constraintVertical_bias="0.416"
             tools:ignore="MissingConstraints" />
 
         <ImageView
