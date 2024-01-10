@@ -11,22 +11,26 @@ import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class FacturaViewHolder(view: View):RecyclerView.ViewHolder(view){ //TODO hacer con retrofit
-    val binding = ListaFacturasBinding.bind(view)
+class FacturaViewHolder(view: View) : RecyclerView.ViewHolder(view) { //TODO hacer con retrofit
+    private val binding = ListaFacturasBinding.bind(view)
     private lateinit var factura: Factura
 
     @SuppressLint("SetTextI18n")
-    fun render(item: Factura, onClickListener:(Factura) -> Unit){
+    fun render(item: Factura, onClickListener: (Factura) -> Unit) {
         binding.tvEstadoFactura.text = item.descEstado
-        if (item.descEstado=="Pendiente de pago"){
-            binding.tvEstadoFactura.setTextColor(ContextCompat.getColor(itemView.context,
-                R.color.red))
-        }else{
+        if (item.descEstado == "Pendiente de pago") {
+            binding.tvEstadoFactura.setTextColor(
+                ContextCompat.getColor(
+                    itemView.context,
+                    R.color.red
+                )
+            )
+        } else {
             binding.tvEstadoFactura.text = ""
         }
         binding.tvFechaFactura.text = formatearFecha(item.fecha)
-        binding.tvPrecioFactura.text= item.importeOrdenacion.toString()  + " €"
-        itemView.setOnClickListener{
+        binding.tvPrecioFactura.text = item.importeOrdenacion.toString() + " €"
+        itemView.setOnClickListener {
             onClickListener(item)
         }
         factura = item
@@ -38,8 +42,12 @@ class FacturaViewHolder(view: View):RecyclerView.ViewHolder(view){ //TODO hacer 
             val fecha = formatoEntrada.parse(fechaString)
 
             // Formateo la fecha a "dd MMM yyyy" en español
-            val formatoSalida = SimpleDateFormat("dd MMM yyyy", Locale("es",
-                "ES"))
+            val formatoSalida = SimpleDateFormat(
+                "dd MMM yyyy", Locale(
+                    "es",
+                    "ES"
+                )
+            )
             return formatoSalida.format(fecha!!)
         } catch (e: ParseException) {
             e.printStackTrace()

@@ -14,45 +14,45 @@
         android:layout_height="?attr/actionBarSize"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        />
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/tvFechaEmisionFactura"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/con_fecha_de_emision"
-        android:textStyle="bold"
         android:layout_marginHorizontal="20dp"
         android:layout_marginVertical="10dp"
+        android:text="@string/con_fecha_de_emision"
+        android:textStyle="bold"
         app:layout_constraintTop_toBottomOf="@+id/includeMainActivity"
-        tools:ignore="MissingConstraints"/>
+        tools:ignore="MissingConstraints" />
 
     <TextView
         android:id="@+id/tvDesde"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
         android:layout_marginTop="16dp"
         android:text="@string/desde"
-        android:layout_marginHorizontal="20dp"
         app:layout_constraintEnd_toStartOf="@+id/tvHasta"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvFechaEmisionFactura"
-        tools:ignore="MissingConstraints"/>
+        tools:ignore="MissingConstraints" />
 
     <Button
         android:id="@+id/btnDesde"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/dia_mes_ano"
         android:layout_marginHorizontal="20dp"
         android:backgroundTint="@color/light_grey"
+        android:text="@string/dia_mes_ano"
         android:textColor="@color/dark_grey"
         app:layout_constraintEnd_toStartOf="@+id/btnHasta"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvDesde"
-        tools:ignore="MissingConstraints"/>
+        tools:ignore="MissingConstraints" />
 
     <TextView
         android:id="@+id/tvHasta"
@@ -63,44 +63,43 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvFechaEmisionFactura"
-        tools:ignore="MissingConstraints"/>
+        tools:ignore="MissingConstraints" />
 
     <Button
         android:id="@+id/btnHasta"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="92dp"
-        android:text="@string/dia_mes_ano"
         android:backgroundTint="@color/light_grey"
+        android:text="@string/dia_mes_ano"
         android:textColor="@color/dark_grey"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvHasta"
-        tools:ignore="MissingConstraints"/>
+        tools:ignore="MissingConstraints" />
 
     <com.google.android.material.divider.MaterialDivider
         android:id="@+id/dividerFecha"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
         android:layout_marginTop="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnHasta"
-        android:layout_marginHorizontal="20dp"
-        tools:ignore="MissingConstraints">
-    </com.google.android.material.divider.MaterialDivider>
+        tools:ignore="MissingConstraints"></com.google.android.material.divider.MaterialDivider>
 
     <TextView
         android:id="@+id/tvImporteFactura"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
         android:layout_marginTop="16dp"
         android:text="@string/por_un_importe"
-        android:layout_marginHorizontal="20dp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/dividerFecha"
-        tools:ignore="MissingConstraints"/>
+        tools:ignore="MissingConstraints" />
 
     <TextView
         android:id="@+id/tvMinImporte"
@@ -111,7 +110,7 @@
         android:text="1€"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvImporteFactura"
-        tools:ignore="MissingConstraints"/>
+        tools:ignore="MissingConstraints" />
 
     <TextView
         android:id="@+id/tvMaxImporte"
@@ -122,7 +121,7 @@
         android:text="300€"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvImporteFactura"
-        tools:ignore="MissingConstraints"/>
+        tools:ignore="MissingConstraints" />
 
     <TextView
         android:id="@+id/tvIntervaloImporte"
@@ -134,44 +133,43 @@
         app:layout_constraintEnd_toStartOf="@+id/tvMaxImporte"
         app:layout_constraintStart_toEndOf="@+id/tvMinImporte"
         app:layout_constraintTop_toBottomOf="@+id/tvImporteFactura"
-        tools:ignore="MissingConstraints"/>
+        tools:ignore="MissingConstraints" />
 
     <SeekBar
         android:id="@+id/seekbarImporte"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
         android:layout_marginTop="12dp"
-        android:thumbTint="#8BC34A"
         android:thumb="@drawable/bola_seekbar_personalizada"
+        android:thumbTint="#8BC34A"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvMinImporte"
-        android:layout_marginHorizontal="20dp"
-        />
+        app:layout_constraintTop_toBottomOf="@+id/tvMinImporte" />
 
     <com.google.android.material.divider.MaterialDivider
         android:id="@+id/dividerImporte"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
         android:layout_marginTop="16dp"
         app:layout_constraintTop_toBottomOf="@+id/seekbarImporte"
-        android:layout_marginHorizontal="20dp"
-        tools:ignore="MissingConstraints"/>
+        tools:ignore="MissingConstraints" />
 
     <TextView
         android:id="@+id/tvEstadoFactura"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginHorizontal="20dp"
         android:layout_marginTop="16dp"
         android:text="@string/por_estado"
         android:textStyle="bold"
-        android:layout_marginHorizontal="20dp"
 
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/dividerImporte"
-        tools:ignore="MissingConstraints"/>
+        tools:ignore="MissingConstraints" />
 
     <CheckBox
         android:id="@+id/checkboxPagada"
@@ -188,70 +186,70 @@
         android:id="@+id/checkboxAnuladas"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/anuladas"
         android:layout_marginHorizontal="20dp"
+        android:text="@string/anuladas"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/checkboxPagada"/>
+        app:layout_constraintTop_toBottomOf="@+id/checkboxPagada" />
 
     <CheckBox
         android:id="@+id/checkboxCuotaFija"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/cuota_fija"
         android:layout_marginHorizontal="20dp"
+        android:text="@string/cuota_fija"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/checkboxAnuladas"/>
+        app:layout_constraintTop_toBottomOf="@+id/checkboxAnuladas" />
 
     <CheckBox
         android:id="@+id/checkboxPendientesDePago"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/pendientes_de_pago"
         android:layout_marginHorizontal="20dp"
+        android:text="@string/pendientes_de_pago"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/checkboxCuotaFija"/>
+        app:layout_constraintTop_toBottomOf="@+id/checkboxCuotaFija" />
 
     <CheckBox
         android:id="@+id/checkboxPlanDePago"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
-        android:text="@string/plan_de_pago"
         android:layout_marginHorizontal="20dp"
+        android:text="@string/plan_de_pago"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/checkboxPendientesDePago"/>
+        app:layout_constraintTop_toBottomOf="@+id/checkboxPendientesDePago" />
 
     <Button
         android:id="@+id/btnAplicar"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="@string/aplicar"
         android:backgroundTint="@color/green"
+        android:text="@string/aplicar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/checkboxPlanDePago"
-        tools:ignore="MissingConstraints"/>
+        tools:ignore="MissingConstraints" />
 
     <Button
         android:id="@+id/btnEliminarFiltros"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:text="@string/eliminar_filtros"
         android:backgroundTint="@color/white"
-        android:textColor="@color/green"
         android:elevation="8dp"
+        android:text="@string/eliminar_filtros"
+        android:textColor="@color/green"
 
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnAplicar"/>
+        app:layout_constraintTop_toBottomOf="@+id/btnAplicar" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

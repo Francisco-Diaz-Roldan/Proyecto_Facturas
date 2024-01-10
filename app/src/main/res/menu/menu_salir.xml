@@ -5,6 +5,5 @@
         android:id="@+id/menuOpciones"
         android:icon="@drawable/cerrar"
         android:title=""
-        app:showAsAction="ifRoom">
-    </item>
+        app:showAsAction="ifRoom"/>
 </menu>

@@ -10,7 +10,6 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView.Adapter
 import com.example.proyecto_facturas.R
 import com.example.proyecto_facturas.adapter.FacturaAdapter
 import com.example.proyecto_facturas.adapter.FacturaProvider
@@ -29,13 +28,13 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         listaFactura = FacturaProvider.listaFacturas
-        binding.rvFacturas.layoutManager=LinearLayoutManager(this)
-        binding.rvFacturas.adapter=
-            FacturaAdapter(listaFactura){factura ->
-            onItemSelected(factura)
+        binding.rvFacturas.layoutManager = LinearLayoutManager(this)
+        binding.rvFacturas.adapter =
+            FacturaAdapter(listaFactura) { factura ->
+                onItemSelected(factura)
             }
 
-        this.onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true){
+        this.onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 finish()
             }
@@ -56,21 +55,21 @@ class MainActivity : AppCompatActivity() {
 
     private fun onItemSelected(factura: Factura) {
         mostrarDialogAlerta()
-
     }
 
     private fun mostrarDialogAlerta() {
         val builder = AlertDialog.Builder(this)
 
-        // Configuración del diálogo
+        // Configuro el diálogo
         builder.setTitle("Informción")
         builder.setMessage("Esta funcionalidad aún no está disponible")
 
         // Botón negativo Cerrar
-        builder.setNegativeButton("Cerrar") { dialog, which -> dialog.dismiss()
+        builder.setNegativeButton("Cerrar") { dialog, which ->
+            dialog.dismiss()
         }
 
-        // Crear y mostrar el diálogo
+        // Creo y enseño el diálogo
         val alertDialog: AlertDialog = builder.create()
         alertDialog.show()
     }
@@ -82,7 +81,6 @@ class MainActivity : AppCompatActivity() {
                 startActivity(intent)
                 return true
             }
-            // Otros casos según las necesidades
             else -> return super.onOptionsItemSelected(item)
         }
     }

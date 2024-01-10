@@ -4,15 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    app:cardCornerRadius="17dp"
     android:layout_marginHorizontal="10dp"
     android:layout_marginVertical="10dp"
+    app:cardCornerRadius="17dp"
     app:cardElevation="5dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:layout_marginHorizontal="16dp" >
+        android:layout_marginHorizontal="16dp">
 
         <TextView
             android:id="@+id/tvFechaFactura"
@@ -63,7 +63,7 @@
             app:layout_constraintBottom_toBottomOf="@+id/tvPrecioFactura"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="@+id/tvPrecioFactura"
-            tools:ignore="MissingConstraints"/>
+            tools:ignore="MissingConstraints" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>
