@@ -22,6 +22,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var intentLaunch: ActivityResultLauncher<Intent>
     private lateinit var adapter: FacturaAdapter
+    private var valorMax: Double = 0.0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -40,12 +42,25 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
+        //Declaro el valor máximo que le pasaré a la Toolbar
+        valorMax = calcularMaximo()
+
         // Configuro la toolbar genérica
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
 
         // Modifico el título de la barra de herramientas (toolbar)
         supportActionBar?.title = "Facturas"
+
+    }
+
+    private fun calcularMaximo(): Double {
+        var importeMaximo = 0.0
+        for (factura in listaFactura) {
+            val facturaActual = factura.importeOrdenacion
+            if(importeMaximo < facturaActual) importeMaximo = facturaActual
+        }
+        return  importeMaximo
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -75,13 +90,14 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
+        return when (item.itemId) {
             R.id.menuFiltrar -> {
                 val intent = Intent(this, FiltradoActivity::class.java)
+                intent.putExtra("valorMax", valorMax)
                 startActivity(intent)
-                return true
+                true
             }
-            else -> return super.onOptionsItemSelected(item)
+            else -> super.onOptionsItemSelected(item)
         }
     }
 }

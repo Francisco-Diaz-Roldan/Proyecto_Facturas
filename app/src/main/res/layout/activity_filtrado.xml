@@ -107,7 +107,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
-        android:text="1€"
+        android:text="@string/_0e"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvImporteFactura"
         tools:ignore="MissingConstraints" />
@@ -124,7 +124,7 @@
         tools:ignore="MissingConstraints" />
 
     <TextView
-        android:id="@+id/tvIntervaloImporte"
+        android:id="@+id/tvImporteActual"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
