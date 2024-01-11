@@ -28,17 +28,17 @@ class FiltradoActivity : AppCompatActivity() {
     private lateinit var intentLaunch: ActivityResultLauncher<Intent>
     private lateinit var btnDesde: Button
     private lateinit var btnHasta: Button
-    private lateinit var tvMinImporte:TextView
-    private lateinit var tvMaxImporte:TextView
-    private lateinit var tvImporteActual:TextView
-    private lateinit var seekbarImporte:SeekBar
-    private lateinit var checkboxPagada:CheckBox
-    private lateinit var checkboxAnuladas:CheckBox
-    private lateinit var checkboxCuotaFija:CheckBox
-    private lateinit var checkboxPendientesDePago:CheckBox
-    private lateinit var checkboxPlanDePago:CheckBox
-    private lateinit var btnAplicar:Button
-    private lateinit var btnEliminarFiltros:Button
+    private lateinit var tvMinImporte: TextView
+    private lateinit var tvMaxImporte: TextView
+    private lateinit var tvImporteActual: TextView
+    private lateinit var seekbarImporte: SeekBar
+    private lateinit var checkboxPagada: CheckBox
+    private lateinit var checkboxAnuladas: CheckBox
+    private lateinit var checkboxCuotaFija: CheckBox
+    private lateinit var checkboxPendientesDePago: CheckBox
+    private lateinit var checkboxPlanDePago: CheckBox
+    private lateinit var btnAplicar: Button
+    private lateinit var btnEliminarFiltros: Button
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,17 +49,17 @@ class FiltradoActivity : AppCompatActivity() {
         listaFactura = FacturaProvider.listaFacturas
         //Para el botón desde
         btnDesde = binding.btnDesde
-        btnDesde.setOnClickListener{
-            obtenerFecha(binding.btnDesde, true,false)
+        btnDesde.setOnClickListener {
+            obtenerFecha(binding.btnDesde, true, false)
         }
         //Para el botón hasta
         btnHasta = binding.btnHasta
-        btnHasta.setOnClickListener{
+        btnHasta.setOnClickListener {
             obtenerFecha(binding.btnHasta, false, true)
         }
         //Para la seekbar
         //Recibo el valor máximo de las facturas de la ventana anterior y lo redondeo
-        val valorMax = intent.getDoubleExtra("valorMax", 0.0).toInt()+1
+        val valorMax = intent.getDoubleExtra("valorMax", 0.0).toInt() + 1
 
         //Configuro la seekbar y los textos con sus valores min, max y actuales
         seekbarImporte = binding.seekbarImporte
@@ -81,25 +81,19 @@ class FiltradoActivity : AppCompatActivity() {
 
         //Para el boton de eliminar filtros
         btnEliminarFiltros = binding.btnEliminarFiltros
-        btnEliminarFiltros.setOnClickListener{
+        btnEliminarFiltros.setOnClickListener {
             //Para restablecer los valores de texto de los botones con las fechas
-            btnDesde.text = getString(R.string.dia_mes_ano)
-            btnHasta.text = getString(R.string.dia_mes_ano)
+            resetearFecha()
             //Para restablecer el valor de la seekbar a 0
-            calcularValorActualSeekbar(0)
-
+            resetearSeekbar()
             //Para restablecer los valores de las checkboxes
-            checkboxPagada.isChecked = false
-            checkboxAnuladas.isChecked = false
-            checkboxCuotaFija.isChecked = false
-            checkboxPendientesDePago.isChecked = false
-            checkboxPlanDePago.isChecked = false
+            resetearCheckBoxes()
         }
 
         //Para el boton de aplicar filtros
         btnAplicar = binding.btnAplicar
         btnAplicar.setOnClickListener {
-        //TODO
+            //TODO
         }
 
 
@@ -111,12 +105,26 @@ class FiltradoActivity : AppCompatActivity() {
         supportActionBar?.title = "Filtrar facturas"
     }
 
+    private fun resetearFecha() {
+        btnDesde.text = getString(R.string.dia_mes_ano)
+        btnHasta.text = getString(R.string.dia_mes_ano)
+    }
 
+    private fun resetearSeekbar(){
+        seekbarImporte.progress = 0
+    }
+
+    private fun resetearCheckBoxes(){
+        checkboxPagada.isChecked = false
+        checkboxAnuladas.isChecked = false
+        checkboxCuotaFija.isChecked = false
+        checkboxPendientesDePago.isChecked = false
+        checkboxPlanDePago.isChecked = false
+    }
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_cerrar, menu)
         return true
     }
-
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
@@ -125,12 +133,14 @@ class FiltradoActivity : AppCompatActivity() {
                 startActivity(intent)
                 return true
             }
+
             else -> return super.onOptionsItemSelected(item)
         }
     }
 
-    private fun obtenerFecha(button: Button, restriccionMaxDate: Boolean = false
-                             , restriccionMinDate: Boolean = false) {
+    private fun obtenerFecha(
+        button: Button, restriccionMaxDate: Boolean = false, restriccionMinDate: Boolean = false
+    ) {
         val calendario = Calendar.getInstance()
         val anno = calendario.get(Calendar.YEAR)
         val mes = calendario.get(Calendar.MONTH)
@@ -139,18 +149,17 @@ class FiltradoActivity : AppCompatActivity() {
         val datePickerDialog = DatePickerDialog(this,
             { _, year, month, dayOfMonth ->
                 button.text = "$dayOfMonth/${month + 1}/$year"
-            }, anno, mes, dia)
+            }, anno, mes, dia
+        )
 
-        // Establecer fecha mínima
+        // Establezco las fechas mínimas y máximas
         if (restriccionMinDate) {
             datePickerDialog.datePicker.minDate = calendario.timeInMillis
         }
 
         if (restriccionMaxDate) {
             datePickerDialog.datePicker.maxDate = Date().time
-
         }
-
         datePickerDialog.show()
     }
 
@@ -165,7 +174,7 @@ class FiltradoActivity : AppCompatActivity() {
         //Acciones a realizar en caso de mover la barra
         seekbarImporte.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
-                tvImporteActual.text = "${ i }€"  //Escribo el valor actual de la seekbar y le añado €
+                tvImporteActual.text = "${i}€"  //Escribo el valor actual de la seekbar y le añado €
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar) {
