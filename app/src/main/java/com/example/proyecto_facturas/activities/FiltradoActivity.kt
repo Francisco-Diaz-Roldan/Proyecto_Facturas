@@ -58,9 +58,10 @@ class FiltradoActivity : AppCompatActivity() {
             obtenerFecha(binding.btnHasta, false)
         }
         //Para la seekbar
-        //Recibo el valor máximo de las facturas de la ventana anterior
-        val valorMax = intent.getDoubleExtra("valorMax", 0.0).toInt()+1 //Redondeo el valor máximo
+        //Recibo el valor máximo de las facturas de la ventana anterior y lo redondeo
+        val valorMax = intent.getDoubleExtra("valorMax", 0.0).toInt()+1
 
+        //Configuro la seekbar y los textos con sus valores min, max y actuales
         seekbarImporte = binding.seekbarImporte
         seekbarImporte.max = valorMax   //Le indico el valor máximo para que no vaya hasta 100
         tvMinImporte = binding.tvMinImporte
@@ -69,6 +70,15 @@ class FiltradoActivity : AppCompatActivity() {
         tvMinImporte.text = getString(R.string.`_0e`)
         tvImporteActual.text = getString(R.string.`_0e`)
         calcularValorActualSeekbar(valorMax)
+
+        //Para las checkboxes
+        checkboxPagada = binding.checkboxPagada
+        checkboxAnuladas = binding.checkboxAnuladas
+        checkboxCuotaFija = binding.checkboxCuotaFija
+        checkboxPendientesDePago = binding.checkboxPendientesDePago
+        checkboxPlanDePago = binding.checkboxPlanDePago
+
+
 
 
         // Configuro la toolbar
