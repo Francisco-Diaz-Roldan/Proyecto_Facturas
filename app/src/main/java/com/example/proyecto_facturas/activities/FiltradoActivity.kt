@@ -48,12 +48,12 @@ class FiltradoActivity : AppCompatActivity() {
 
         btnDesde = binding.btnDesde
         btnDesde.setOnClickListener{
-            obtenerFechaDesde()
+            obtenerFecha(binding.btnDesde, true)
         }
 
         btnHasta = binding.btnHasta
         btnHasta.setOnClickListener{
-            obtenerFechaHasta()
+            obtenerFecha(binding.btnHasta, false)
         }
 
         // Configuro la toolbar genérica
@@ -82,31 +82,21 @@ class FiltradoActivity : AppCompatActivity() {
         }
     }
 
-    private fun obtenerFechaDesde() {
+    private fun obtenerFecha(button: Button, restriccionMaxDate: Boolean = false) {
         val calendario = Calendar.getInstance()
         val anno = calendario.get(Calendar.YEAR)
         val mes = calendario.get(Calendar.MONTH) + 1
         val dia = calendario.get(Calendar.DAY_OF_MONTH)
+
         val datePickerDialog = DatePickerDialog(this,
             { view, year1, month, dayOfMonth ->
-                binding.btnDesde.text = "$dayOfMonth/${month + 1}/$year1"
+                button.text = "$dayOfMonth/${month + 1}/$year1"
             }, anno, mes, dia)
 
-        datePickerDialog.datePicker.maxDate = Date().time
-        datePickerDialog.show()
-    }
+        if (restriccionMaxDate) {
+            datePickerDialog.datePicker.maxDate = Date().time
+        }
 
-    private fun obtenerFechaHasta() {
-        val calendario = Calendar.getInstance()
-        val anno = calendario.get(Calendar.YEAR)
-        val mes = calendario.get(Calendar.MONTH) + 1
-        val dia = calendario.get(Calendar.DAY_OF_MONTH)
-        val datePickerDialog = DatePickerDialog(this,
-            { view, year1, month, dayOfMonth ->
-                binding.btnHasta.text = "$dayOfMonth/${month + 1}/$year1"
-            }, anno, mes, dia)
-
-        //datePickerDialog.datePicker.maxDate = Date().time
         datePickerDialog.show()
     }
 }
