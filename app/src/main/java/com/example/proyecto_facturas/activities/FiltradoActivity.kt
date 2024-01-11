@@ -42,13 +42,18 @@ class FiltradoActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityFiltradoBinding.inflate(layoutInflater)
-        setContentView(R.layout.activity_filtrado)
+        setContentView(binding.root)
 
         listaFactura = FacturaProvider.listaFacturas
 
         btnDesde = binding.btnDesde
         btnDesde.setOnClickListener{
             obtenerFechaDesde()
+        }
+
+        btnHasta = binding.btnHasta
+        btnHasta.setOnClickListener{
+            obtenerFechaHasta()
         }
 
         // Configuro la toolbar genérica
@@ -88,6 +93,20 @@ class FiltradoActivity : AppCompatActivity() {
             }, anno, mes, dia)
 
         datePickerDialog.datePicker.maxDate = Date().time
+        datePickerDialog.show()
+    }
+
+    private fun obtenerFechaHasta() {
+        val calendario = Calendar.getInstance()
+        val anno = calendario.get(Calendar.YEAR)
+        val mes = calendario.get(Calendar.MONTH) + 1
+        val dia = calendario.get(Calendar.DAY_OF_MONTH)
+        val datePickerDialog = DatePickerDialog(this,
+            { view, year1, month, dayOfMonth ->
+                binding.btnHasta.text = "$dayOfMonth/${month + 1}/$year1"
+            }, anno, mes, dia)
+
+        //datePickerDialog.datePicker.maxDate = Date().time
         datePickerDialog.show()
     }
 }
