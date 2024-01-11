@@ -59,16 +59,16 @@ class FiltradoActivity : AppCompatActivity() {
         }
         //Para la seekbar
         //Recibo el valor máximo de las facturas de la ventana anterior
-        val valorMax = intent.getDoubleExtra("valorMax", 0.0)
+        val valorMax = intent.getDoubleExtra("valorMax", 0.0).toInt()+1 //Redondeo el valor máximo
 
         seekbarImporte = binding.seekbarImporte
+        seekbarImporte.max = valorMax   //Le indico el valor máximo para que no vaya hasta 100
         tvMinImporte = binding.tvMinImporte
-        tvMinImporte.text = getString(R.string.`_0e`)
         tvMaxImporte = binding.tvMaxImporte
-        tvMaxImporte.text = "${valorMax.toInt()+1}€" //Redondeo el valor máximo
         tvImporteActual = binding.tvImporteActual
+        tvMinImporte.text = getString(R.string.`_0e`)
         tvImporteActual.text = getString(R.string.`_0e`)
-        calcularValorActualSeekbar(valorMax.toInt())
+        calcularValorActualSeekbar(valorMax)
 
 
         // Configuro la toolbar
@@ -114,27 +114,27 @@ class FiltradoActivity : AppCompatActivity() {
     }
 
     private fun calcularValorActualSeekbar(maxImporte: Int) {
-        //Seekbar y textos de la seekbar, inicializar y onClick
-        val seekBar = findViewById<SeekBar>(R.id.seekbarImporte)
-        val tvMaxSeekBar = findViewById<TextView>(R.id.tvMaxImporte)
-        val tvValorImporte = findViewById<TextView>(R.id.tvImporteActual)
+        //Seekbar y textos de la seekbar
+        val seekbarImporte = findViewById<SeekBar>(R.id.seekbarImporte)
+        val tvMaxImporte = findViewById<TextView>(R.id.tvMaxImporte)
+        val tvImporteActual = findViewById<TextView>(R.id.tvImporteActual)
 
-        tvMaxSeekBar.text = maxImporte.toString()
+        tvMaxImporte.text = "${maxImporte}€" //Escribo el valor maximo de la seekbar y le añado €
 
         //Acciones a realizar en caso de mover la barra
-        seekBar.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
+        seekbarImporte.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
-                tvValorImporte.text = i.toString()
+                tvImporteActual.text = "${ i }€"  //Escribo el valor actual de la seekbar y le añado €
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar) {
                 //No hace nada
-                Log.d("onStartTrackingTouch", "onStartTrackingTouch: ha fallado")
+                Log.d("onStartTrackingTouch", "onStartTrackingTouch: algo ha fallado")
             }
 
             override fun onStopTrackingTouch(seekBar: SeekBar) {
                 //No hace nada
-                Log.d("onStopTrackingTouch", "onStopTrackingTouch: ha fallado")
+                Log.d("onStopTrackingTouch", "onStopTrackingTouch: algo ha fallado")
             }
         })
     }
