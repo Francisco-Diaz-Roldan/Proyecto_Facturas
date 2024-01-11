@@ -50,12 +50,12 @@ class FiltradoActivity : AppCompatActivity() {
         //Para el botón desde
         btnDesde = binding.btnDesde
         btnDesde.setOnClickListener{
-            obtenerFecha(binding.btnDesde, true)
+            obtenerFecha(binding.btnDesde, true,false)
         }
         //Para el botón hasta
         btnHasta = binding.btnHasta
         btnHasta.setOnClickListener{
-            obtenerFecha(binding.btnHasta, false)
+            obtenerFecha(binding.btnHasta, false, true)
         }
         //Para la seekbar
         //Recibo el valor máximo de las facturas de la ventana anterior y lo redondeo
@@ -129,19 +129,28 @@ class FiltradoActivity : AppCompatActivity() {
         }
     }
 
-    private fun obtenerFecha(button: Button, restriccionMaxDate: Boolean = false, ) {
+    private fun obtenerFecha(button: Button, restriccionMaxDate: Boolean = false
+                             , restriccionMinDate: Boolean = false) {
         val calendario = Calendar.getInstance()
         val anno = calendario.get(Calendar.YEAR)
-        val mes = calendario.get(Calendar.MONTH) + 1
+        val mes = calendario.get(Calendar.MONTH)
         val dia = calendario.get(Calendar.DAY_OF_MONTH)
+
         val datePickerDialog = DatePickerDialog(this,
-            { view, year1, month, dayOfMonth ->
-                button.text = "$dayOfMonth/${month + 1}/$year1"
+            { _, year, month, dayOfMonth ->
+                button.text = "$dayOfMonth/${month + 1}/$year"
             }, anno, mes, dia)
+
+        // Establecer fecha mínima
+        if (restriccionMinDate) {
+            datePickerDialog.datePicker.minDate = calendario.timeInMillis
+        }
 
         if (restriccionMaxDate) {
             datePickerDialog.datePicker.maxDate = Date().time
+
         }
+
         datePickerDialog.show()
     }
 
