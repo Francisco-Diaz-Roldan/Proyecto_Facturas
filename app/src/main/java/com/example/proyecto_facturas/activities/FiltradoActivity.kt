@@ -2,6 +2,7 @@ package com.example.proyecto_facturas.activities
 
 import android.app.DatePickerDialog
 import android.content.Intent
+import android.icu.text.SimpleDateFormat
 import android.icu.util.Calendar
 import android.os.Bundle
 import android.util.Log
@@ -20,6 +21,7 @@ import com.example.proyecto_facturas.adapter.FacturaProvider
 import com.example.proyecto_facturas.databinding.ActivityFiltradoBinding
 import com.example.proyecto_facturas.domain.Factura
 import java.util.Date
+import java.util.Locale
 
 class FiltradoActivity : AppCompatActivity() {
 
@@ -49,12 +51,12 @@ class FiltradoActivity : AppCompatActivity() {
         listaFactura = FacturaProvider.listaFacturas
         //Para el botón desde
         btnDesde = binding.btnDesde
-        btnDesde.setOnClickListener{
+        btnDesde.setOnClickListener {
             obtenerFecha(binding.btnDesde, true)
         }
         //Para el botón hasta
         btnHasta = binding.btnHasta
-        btnHasta.setOnClickListener{
+        btnHasta.setOnClickListener {
             obtenerFecha(binding.btnHasta, false)
         }
         //Para la seekbar
@@ -79,6 +81,27 @@ class FiltradoActivity : AppCompatActivity() {
         checkboxPlanDePago = binding.checkboxPlanDePago
 
 
+        //Para el boton de eliminar filtros
+        btnEliminarFiltros = binding.btnEliminarFiltros
+        btnEliminarFiltros.setOnClickListener{
+            //Para restablecer los valores de texto de los botones con las fechas
+            btnDesde.text = getString(R.string.dia_mes_ano)
+            btnHasta.text = getString(R.string.dia_mes_ano)
+            //Para restablecer el valor de la seekbar a 0
+            seekbarImporte.progress = 0
+            //Para restablecer los valores de las checkboxes
+            checkboxPagada.isChecked = false
+            checkboxAnuladas.isChecked = false
+            checkboxCuotaFija.isChecked = false
+            checkboxPendientesDePago.isChecked = false
+            checkboxPlanDePago.isChecked = false
+        }
+
+        //Para el boton de aplicar filtros
+        btnAplicar = binding.btnAplicar
+        btnAplicar.setOnClickListener {
+        //TODO
+        }
 
 
         // Configuro la toolbar
@@ -112,6 +135,7 @@ class FiltradoActivity : AppCompatActivity() {
         val anno = calendario.get(Calendar.YEAR)
         val mes = calendario.get(Calendar.MONTH) + 1
         val dia = calendario.get(Calendar.DAY_OF_MONTH)
+
         val datePickerDialog = DatePickerDialog(this,
             { view, year1, month, dayOfMonth ->
                 button.text = "$dayOfMonth/${month + 1}/$year1"
@@ -119,8 +143,20 @@ class FiltradoActivity : AppCompatActivity() {
 
         if (restriccionMaxDate) {
             datePickerDialog.datePicker.maxDate = Date().time
+        } else {
+            // Si no es una restricción de fecha máxima, obtenemos la fecha seleccionada
+            // del primer datepicker y la configuramos como la fecha mínima para el segundo
+            val fechaDesde = obtenerFechaSeleccionada(binding.btnDesde)
+            datePickerDialog.datePicker.minDate = fechaDesde.time
         }
+
         datePickerDialog.show()
+    }
+
+    private fun obtenerFechaSeleccionada(button: Button): Date {
+        val fechaTexto = button.text.toString()
+        val formato = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        return formato.parse(fechaTexto) ?: Date()
     }
 
     private fun calcularValorActualSeekbar(maxImporte: Int) {
