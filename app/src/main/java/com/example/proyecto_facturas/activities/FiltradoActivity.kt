@@ -55,7 +55,7 @@ class FiltradoActivity : AppCompatActivity() {
         //Para el botón hasta
         btnHasta = binding.btnHasta
         btnHasta.setOnClickListener {
-            obtenerFecha(binding.btnHasta, false, true)
+            obtenerFecha(binding.btnHasta, true, false)
         }
         //Para la seekbar
         //Recibo el valor máximo de las facturas de la ventana anterior y lo redondeo
