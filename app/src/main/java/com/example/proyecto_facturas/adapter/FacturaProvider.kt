@@ -1,6 +1,6 @@
 package com.example.proyecto_facturas.adapter
 
-import com.example.proyecto_facturas.domain.Factura
+import com.example.proyecto_facturas.data.Factura
 
 class FacturaProvider { //TODO hacer con retrofit
 

@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.proyecto_facturas.R
-import com.example.proyecto_facturas.domain.Factura
+import com.example.proyecto_facturas.data.Factura
 
 class FacturaAdapter(
     private val facturaLista: List<Factura>, private val onClickListener: (Factura)
