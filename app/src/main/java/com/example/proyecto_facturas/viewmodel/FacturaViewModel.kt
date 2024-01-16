@@ -1,16 +1,19 @@
-package com.example.proyecto_facturas.data
+package com.example.proyecto_facturas.viewmodel
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
+import com.example.proyecto_facturas.data.FacturaDatabase
+import com.example.proyecto_facturas.repository.FacturaRepository
+import com.example.proyecto_facturas.model.Factura
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class FacturaViewModel(application: Application): AndroidViewModel(application) {
 
-    private val getAllFacturas: LiveData<List<Factura>>
-    private val repository:FacturaRepository
+    val getAllFacturas: LiveData<List<Factura>>
+    private val repository: FacturaRepository
 
     init {
         val facturaDAO = FacturaDatabase.getDatabaseInstance(application).facturaDAO()

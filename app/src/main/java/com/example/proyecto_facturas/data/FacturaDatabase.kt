@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.example.proyecto_facturas.model.Factura
 
 @Database(entities = [Factura:: class], version = 1, exportSchema = false)
 abstract class FacturaDatabase: RoomDatabase() {

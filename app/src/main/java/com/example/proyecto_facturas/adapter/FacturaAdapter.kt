@@ -5,12 +5,11 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.proyecto_facturas.R
-import com.example.proyecto_facturas.data.Factura
+import com.example.proyecto_facturas.model.Factura
 
 class FacturaAdapter(
-    private val facturaLista: List<Factura>, private val onClickListener: (Factura)
-    -> Unit
-) : RecyclerView.Adapter<FacturaViewHolder>() {
+    private var facturaLista: List<Factura>?=null,
+    private val onClickListener: (Factura) -> Unit) : RecyclerView.Adapter<FacturaViewHolder>() {
     //TODO hacer el adapter y el retrofit
     @SuppressLint("SuspiciousIndentation")
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FacturaViewHolder {
@@ -26,11 +25,17 @@ class FacturaAdapter(
     }
 
     override fun getItemCount(): Int {
-        return facturaLista.size
+        return facturaLista?.size ?: 0
     }
 
     override fun onBindViewHolder(holder: FacturaViewHolder, position: Int) {
-        val item = facturaLista[position]
-        holder.render(item, onClickListener)
+        val item = facturaLista?.get(position)
+        if (item != null) holder.render(item, onClickListener)
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun setData(factura: List<Factura>?){
+        this.facturaLista = factura
+        notifyDataSetChanged()
     }
 }

@@ -9,18 +9,22 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.proyecto_facturas.R
 import com.example.proyecto_facturas.adapter.FacturaAdapter
 import com.example.proyecto_facturas.adapter.FacturaProvider
 import com.example.proyecto_facturas.databinding.ActivityMainBinding
-import com.example.proyecto_facturas.data.Factura
+import com.example.proyecto_facturas.model.Factura
+import com.example.proyecto_facturas.viewmodel.FacturaViewModel
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var listaFactura: MutableList<Factura>
     private lateinit var binding: ActivityMainBinding
     private lateinit var intentLaunch: ActivityResultLauncher<Intent>
+    private lateinit var facturaViewModel: FacturaViewModel
     private lateinit var adapter: FacturaAdapter
     private var valorMax: Double = 0.0
 
@@ -30,11 +34,22 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         listaFactura = FacturaProvider.listaFacturas
+
+        // Inicializo el adaptador
+        adapter = FacturaAdapter(listaFactura) { factura ->
+            onItemSelected(factura)
+        }
+
+        // Configuro el RecyclerView con el adaptador
         binding.rvFacturas.layoutManager = LinearLayoutManager(this)
         binding.rvFacturas.adapter =
-            FacturaAdapter(listaFactura) { factura ->
-                onItemSelected(factura)
-            }
+            FacturaAdapter(listaFactura) { factura -> onItemSelected(factura) }
+
+        // Configuro el ViewModel y observa los cambios en las facturas
+        facturaViewModel = ViewModelProvider(this).get(FacturaViewModel::class.java)
+        facturaViewModel.getAllFacturas.observe(this, Observer { factura ->
+            adapter.setData(factura)
+        })
 
         this.onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -51,7 +66,6 @@ class MainActivity : AppCompatActivity() {
 
         // Modifico el título de la barra de herramientas (toolbar)
         supportActionBar?.title = "Facturas"
-
     }
 
     private fun calcularMaximo(): Double {

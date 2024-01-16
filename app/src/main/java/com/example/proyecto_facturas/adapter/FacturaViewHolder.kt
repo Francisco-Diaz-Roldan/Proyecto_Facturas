@@ -6,7 +6,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.example.proyecto_facturas.R
 import com.example.proyecto_facturas.databinding.ListaFacturasBinding
-import com.example.proyecto_facturas.data.Factura
+import com.example.proyecto_facturas.model.Factura
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Locale

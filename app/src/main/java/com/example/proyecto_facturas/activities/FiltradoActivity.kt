@@ -18,7 +18,7 @@ import androidx.appcompat.widget.Toolbar
 import com.example.proyecto_facturas.R
 import com.example.proyecto_facturas.adapter.FacturaProvider
 import com.example.proyecto_facturas.databinding.ActivityFiltradoBinding
-import com.example.proyecto_facturas.data.Factura
+import com.example.proyecto_facturas.model.Factura
 import java.util.Date
 
 class FiltradoActivity : AppCompatActivity() {
