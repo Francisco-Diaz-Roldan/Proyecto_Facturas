@@ -16,7 +16,7 @@ import com.example.proyecto_facturas.R
 import com.example.proyecto_facturas.adapter.FacturaAdapter
 import com.example.proyecto_facturas.adapter.FacturaProvider
 import com.example.proyecto_facturas.databinding.ActivityMainBinding
-import com.example.proyecto_facturas.model.Factura
+import com.example.proyecto_facturas.data.rom.Factura
 import com.example.proyecto_facturas.viewmodel.FacturaViewModel
 
 class MainActivity : AppCompatActivity() {

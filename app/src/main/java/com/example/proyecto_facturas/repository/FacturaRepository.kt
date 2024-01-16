@@ -1,8 +1,8 @@
 package com.example.proyecto_facturas.repository
 
 import androidx.lifecycle.LiveData
-import com.example.proyecto_facturas.data.FacturaDAO
-import com.example.proyecto_facturas.model.Factura
+import com.example.proyecto_facturas.data.rom.FacturaDAO
+import com.example.proyecto_facturas.data.rom.Factura
 
 class FacturaRepository(private val facturaDAO: FacturaDAO) {
 

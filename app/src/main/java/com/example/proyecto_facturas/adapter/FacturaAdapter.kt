@@ -5,7 +5,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.proyecto_facturas.R
-import com.example.proyecto_facturas.model.Factura
+import com.example.proyecto_facturas.data.rom.Factura
 
 class FacturaAdapter(
     private var facturaLista: List<Factura>?=null,

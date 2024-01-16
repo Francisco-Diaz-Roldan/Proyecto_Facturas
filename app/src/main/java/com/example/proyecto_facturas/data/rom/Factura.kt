@@ -1,4 +1,4 @@
-package com.example.proyecto_facturas.model
+package com.example.proyecto_facturas.data.rom
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

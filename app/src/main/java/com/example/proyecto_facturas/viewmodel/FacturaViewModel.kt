@@ -4,9 +4,9 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
-import com.example.proyecto_facturas.data.FacturaDatabase
+import com.example.proyecto_facturas.data.rom.FacturaDatabase
 import com.example.proyecto_facturas.repository.FacturaRepository
-import com.example.proyecto_facturas.model.Factura
+import com.example.proyecto_facturas.data.rom.Factura
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 

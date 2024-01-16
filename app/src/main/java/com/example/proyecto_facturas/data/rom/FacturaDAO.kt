@@ -1,11 +1,10 @@
-package com.example.proyecto_facturas.data
+package com.example.proyecto_facturas.data.rom
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.example.proyecto_facturas.model.Factura
 
 @Dao
 interface FacturaDAO {
