@@ -7,7 +7,6 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.OnBackPressedCallback
-import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
@@ -15,28 +14,31 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.proyecto_facturas.R
 import com.example.proyecto_facturas.adapter.FacturaAdapter
-import com.example.proyecto_facturas.data.retrofit.RetrofitServiceInterface
 import com.example.proyecto_facturas.databinding.ActivityMainBinding
 import com.example.proyecto_facturas.data.rom.Factura
 import com.example.proyecto_facturas.viewmodel.FacturaViewModel
+import dagger.hilt.android.AndroidEntryPoint
 
+
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var listaFactura: MutableList<Factura>
+    private var listaFactura: MutableList<Factura> = mutableListOf()
     private lateinit var binding: ActivityMainBinding
-    private lateinit var intentLaunch: ActivityResultLauncher<Intent>
-    private lateinit var facturaViewModel: FacturaViewModel
-    private lateinit var adapter: FacturaAdapter
+    //private lateinit var intentLaunch: ActivityResultLauncher<Intent>
+    private lateinit var facturaAdapter: FacturaAdapter
     private var valorMax: Double = 0.0
-    private lateinit var retrofitServiceInterface: RetrofitServiceInterface
+    //private lateinit var retrofitServiceInterface: RetrofitServiceInterface
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        // Inicializo el adaptador
+        inicializarAdapter()
         // Inicializo RetrofitService
-        retrofitServiceInterface = RetrofitServiceInterface.instance
+        // retrofitServiceInterface = RetrofitServiceInterface.instance()
 
         /*
         val facturaViewModel = ViewModelProvider(this, FacturaViewModelFactory(application, retrofitService))
@@ -60,10 +62,11 @@ class MainActivity : AppCompatActivity() {
         binding.rvFacturas.layoutManager = LinearLayoutManager(this)
         binding.rvFacturas.adapter = FacturaAdapter(listaFactura) { factura -> onItemSelected(factura) }
 
-        // Configuro el ViewModel y observa los cambios en las facturas
+        // Configuro el ViewModel
 */
-        initViewModel()
+        initViewModel() //Inicializo la configuración del RecyclerView
         initMainViewModel()
+
 
 
         this.onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
@@ -72,6 +75,40 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
+        setToolbar()
+    }
+
+    private fun inicializarAdapter() {
+        facturaAdapter = FacturaAdapter() { factura ->
+            onItemSelected(factura)
+        }
+    }
+
+    private fun initMainViewModel() {
+        val viewModel = ViewModelProvider(this).get(FacturaViewModel::class.java)
+        viewModel.getAllRepositoryList().observe(this, Observer<List<Factura>> {
+            //TODO Usar un preferencias compartidas para almacenar los datos filtrados
+
+            facturaAdapter.setData(it)
+            facturaAdapter.notifyDataSetChanged()
+
+            if (it.isEmpty()) {
+                viewModel.llamarApi()
+                Log.d("Datos", it.toString())
+            }
+        })
+        valorMax = calcularMaximo()
+    }
+
+    private fun initViewModel() {
+        binding.rvFacturas.apply {
+            layoutManager = LinearLayoutManager(this@MainActivity)
+            inicializarAdapter()
+            adapter = facturaAdapter
+        }
+    }
+
+    private fun setToolbar() {
         //Declaro el valor máximo que le pasaré a la Toolbar
         valorMax = calcularMaximo()
 
@@ -81,32 +118,6 @@ class MainActivity : AppCompatActivity() {
 
         // Modifico el título de la barra de herramientas (toolbar)
         supportActionBar?.title = "Facturas"
-    }
-
-    private fun initViewModel() {
-        binding.rvFacturas.apply {
-            layoutManager = LinearLayoutManager(this@MainActivity)
-            adapter = FacturaAdapter(){
-                    factura ->  onItemSelected(factura)
-            }
-            adapter = adapter
-        }
-    }
-
-    //TODO hacer la llamada a la api
-    private fun initMainViewModel() {
-        facturaViewModel = ViewModelProvider(this).get(FacturaViewModel::class.java)
-
-        facturaViewModel.getAllFacturas.observe(this, Observer<List<Factura>> {
-        adapter.setData(it)
-            adapter.notifyDataSetChanged()
-
-            if (it.isNullOrEmpty()) {
-                // Si la lista está vacía, llamo a la API
-                facturaViewModel.makeApiCallAndUpdateLiveData()
-                Log.d("Datos", it.toString())
-            }
-        })
     }
 
 

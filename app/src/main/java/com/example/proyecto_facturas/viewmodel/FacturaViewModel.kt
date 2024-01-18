@@ -9,7 +9,7 @@ import javax.inject.Inject
 
 //Inyección de dependencias. Indica que la clase FacturaViewModel debe ser gestionada por Hilt.
 @HiltViewModel
-class facturaViewModel @Inject constructor(private val facturaRepository: FacturaRepository) :
+class FacturaViewModel @Inject constructor(private val facturaRepository: FacturaRepository) :
     ViewModel() {
     fun getAllRepositoryList(): LiveData<List<Factura>> {
         return facturaRepository.obtenerFacturasDesdeRoom()

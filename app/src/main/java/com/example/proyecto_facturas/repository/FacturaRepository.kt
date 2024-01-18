@@ -9,8 +9,9 @@ import com.example.proyecto_facturas.data.rom.Factura
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import javax.inject.Inject
 
-class FacturaRepository(
+class FacturaRepository @Inject constructor(
     private val facturaDAO: FacturaDAO,
     private val retrofitServiceInterface: RetrofitServiceInterface
 ) {
