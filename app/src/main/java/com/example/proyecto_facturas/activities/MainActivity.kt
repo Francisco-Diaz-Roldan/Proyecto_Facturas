@@ -3,6 +3,7 @@ package com.example.proyecto_facturas.activities
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.activity.OnBackPressedCallback
@@ -14,7 +15,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.proyecto_facturas.R
 import com.example.proyecto_facturas.adapter.FacturaAdapter
-import com.example.proyecto_facturas.adapter.FacturaProvider
+import com.example.proyecto_facturas.data.retrofit.RetrofitServiceInterface
 import com.example.proyecto_facturas.databinding.ActivityMainBinding
 import com.example.proyecto_facturas.data.rom.Factura
 import com.example.proyecto_facturas.viewmodel.FacturaViewModel
@@ -27,13 +28,28 @@ class MainActivity : AppCompatActivity() {
     private lateinit var facturaViewModel: FacturaViewModel
     private lateinit var adapter: FacturaAdapter
     private var valorMax: Double = 0.0
+    private lateinit var retrofitServiceInterface: RetrofitServiceInterface
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        listaFactura = FacturaProvider.listaFacturas
+        // Inicializo RetrofitService
+        retrofitServiceInterface = RetrofitServiceInterface.instance
+
+        /*
+        val facturaViewModel = ViewModelProvider(this, FacturaViewModelFactory(application, retrofitService))
+            .get(FacturaViewModel::class.java)
+        facturaViewModel.getAllFacturas.observe(this, Observer { factura ->
+            adapter.setData(factura)
+        })
+        listaFactura = facturaViewModel
+
+
+
+        //Inicializo el Provider
+        //listaFactura = FacturaProvider.listaFacturas
 
         // Inicializo el adaptador
         adapter = FacturaAdapter(listaFactura) { factura ->
@@ -42,14 +58,13 @@ class MainActivity : AppCompatActivity() {
 
         // Configuro el RecyclerView con el adaptador
         binding.rvFacturas.layoutManager = LinearLayoutManager(this)
-        binding.rvFacturas.adapter =
-            FacturaAdapter(listaFactura) { factura -> onItemSelected(factura) }
+        binding.rvFacturas.adapter = FacturaAdapter(listaFactura) { factura -> onItemSelected(factura) }
 
         // Configuro el ViewModel y observa los cambios en las facturas
-        facturaViewModel = ViewModelProvider(this).get(FacturaViewModel::class.java)
-        facturaViewModel.getAllFacturas.observe(this, Observer { factura ->
-            adapter.setData(factura)
-        })
+*/
+        initViewModel()
+        initMainViewModel()
+
 
         this.onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -68,11 +83,38 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.title = "Facturas"
     }
 
+    private fun initViewModel() {
+        binding.rvFacturas.apply {
+            layoutManager = LinearLayoutManager(this@MainActivity)
+            adapter = FacturaAdapter(){
+                    factura ->  onItemSelected(factura)
+            }
+            adapter = adapter
+        }
+    }
+
+    //TODO hacer la llamada a la api
+    private fun initMainViewModel() {
+        facturaViewModel = ViewModelProvider(this).get(FacturaViewModel::class.java)
+
+        facturaViewModel.getAllFacturas.observe(this, Observer<List<Factura>> {
+        adapter.setData(it)
+            adapter.notifyDataSetChanged()
+
+            if (it.isNullOrEmpty()) {
+                // Si la lista está vacía, llamo a la API
+                facturaViewModel.makeApiCallAndUpdateLiveData()
+                Log.d("Datos", it.toString())
+            }
+        })
+    }
+
+
     private fun calcularMaximo(): Double {
         var importeMaximo = 0.0
         for (factura in listaFactura) {
             val facturaActual = factura.importeOrdenacion
-            if(importeMaximo < facturaActual) importeMaximo = facturaActual
+            if(importeMaximo < facturaActual!!) importeMaximo = facturaActual
         }
         return  importeMaximo
     }

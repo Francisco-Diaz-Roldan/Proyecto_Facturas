@@ -16,7 +16,6 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.example.proyecto_facturas.R
-import com.example.proyecto_facturas.adapter.FacturaProvider
 import com.example.proyecto_facturas.databinding.ActivityFiltradoBinding
 import com.example.proyecto_facturas.data.rom.Factura
 import java.util.Date
@@ -46,7 +45,7 @@ class FiltradoActivity : AppCompatActivity() {
         binding = ActivityFiltradoBinding.inflate(layoutInflater)
         setContentView(binding.root)
         //Para la lista de facturas
-        listaFactura = FacturaProvider.listaFacturas
+        //listaFactura = FacturaProvider.listaFacturas
         //Para el botón desde
         btnDesde = binding.btnDesde
         btnDesde.setOnClickListener {

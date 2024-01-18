@@ -28,7 +28,7 @@ class FacturaViewHolder(view: View) : RecyclerView.ViewHolder(view) { //TODO hac
         } else {
             binding.tvEstadoFactura.text = ""
         }
-        binding.tvFechaFactura.text = formatearFecha(item.fecha)
+        binding.tvFechaFactura.text = item.fecha?.let { formatearFecha(it) }
         binding.tvPrecioFactura.text = item.importeOrdenacion.toString() + " €"
         itemView.setOnClickListener {
             onClickListener(item)

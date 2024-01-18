@@ -2,6 +2,9 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.kapt")  // Necesario para implementar Room
+    id("com.google.dagger.hilt.android")// Para usar Hilt ( inyección de dependencias )
+    id("org.jetbrains.kotlin.plugin.parcelize")// Para usar parcelable
+
 }
 
 android {
@@ -52,22 +55,30 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
 
-    //Para implementar Retrofit
+    // Para implementar Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 
-    //Paraimplementar Room
+    // Para implementar Dagger Hilt
+    implementation("com.google.dagger:hilt-android:2.48.1")
+    kapt("com.google.dagger:hilt-compiler:2.48.1")
 
-    // Room components
-    implementation ("androidx.room:room-runtime:2.5.0")
-    kapt ("androidx.room:room-compiler:2.5.0")
-    implementation ("androidx.room:room-ktx:2.5.0")
-    androidTestImplementation ("androidx.room:room-testing:2.5.0")
+    // Para implementar Room
+    implementation("androidx.room:room-runtime:2.5.0")
+    kapt("androidx.room:room-compiler:2.5.0")
+    implementation("androidx.room:room-ktx:2.5.0")
+    androidTestImplementation("androidx.room:room-testing:2.5.0")
 
     // Kotlin components
-    implementation ("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.3.72")
-    api ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.5")
-    api ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.5")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.5.31")
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.5")
+    api("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.5")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0")
+
+    // Para el ciclo de vida de la app
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.4.0")
+
+    // Para implementar el CardView
+    implementation ("androidx.cardview:cardview:1.0.0")
 
 }

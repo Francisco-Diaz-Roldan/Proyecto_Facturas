@@ -1,38 +1,21 @@
 package com.example.proyecto_facturas.viewmodel
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.viewModelScope
-import com.example.proyecto_facturas.data.retrofit.RetrofitService  // Importo RetrofitService
-import com.example.proyecto_facturas.data.rom.FacturaDatabase
+import androidx.lifecycle.ViewModel
 import com.example.proyecto_facturas.repository.FacturaRepository
 import com.example.proyecto_facturas.data.rom.Factura
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class FacturaViewModel(
-    application: Application,
-    retrofitService: RetrofitService ): AndroidViewModel(application) {
-
-    val getAllFacturas: LiveData<List<Factura>>
-    private val repository: FacturaRepository
-
-    init {
-        val facturaDAO = FacturaDatabase.getDatabaseInstance(application).facturaDAO()
-        repository = FacturaRepository(facturaDAO, retrofitService)// Paso RetrofitService al constructor 
-        getAllFacturas = repository.getAllFacturas
+//Inyección de dependencias. Indica que la clase FacturaViewModel debe ser gestionada por Hilt.
+@HiltViewModel
+class facturaViewModel @Inject constructor(private val facturaRepository: FacturaRepository) :
+    ViewModel() {
+    fun getAllRepositoryList(): LiveData<List<Factura>> {
+        return facturaRepository.obtenerFacturasDesdeRoom()
     }
 
-    fun addFactura(factura: Factura){
-        viewModelScope.launch(Dispatchers.IO){
-            repository.addFactura(factura)
-        }
-    }
-
-    fun deleteAllFacturas() {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.deleteAllFacturas()
-        }
+    fun llamarApi() {
+        facturaRepository.llamarApi()
     }
 }

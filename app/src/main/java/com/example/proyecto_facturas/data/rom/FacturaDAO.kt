@@ -9,7 +9,7 @@ import androidx.room.Query
 @Dao
 interface FacturaDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun addFactura(factura: Factura)
+    fun insertarFactura(factura: Factura)
 
     @Query("SELECT * FROM factura_table")
     fun getAllFacturas(): LiveData<List<Factura>>

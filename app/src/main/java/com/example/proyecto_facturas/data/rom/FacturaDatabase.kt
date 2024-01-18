@@ -5,29 +5,25 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 
-@Database(entities = [Factura:: class], version = 1, exportSchema = false)
-abstract class FacturaDatabase: RoomDatabase() {
+@Database(entities = [Factura::class], version = 1, exportSchema = false)
+abstract class FacturaDatabase : RoomDatabase() {
+    abstract fun getAppDAO(): FacturaDAO
 
-    abstract fun facturaDAO(): FacturaDAO
+    companion object {
+        //Instancia de la Base de Datos.
+        private var DB_INSTANCE: FacturaDatabase? = null
 
-    companion object{
-            @Volatile
-            private var INSTANCE: FacturaDatabase?= null
-
-        fun getDatabaseInstance(context: Context): FacturaDatabase {
-            val tempInstance = INSTANCE
-            if (tempInstance != null){
-                return tempInstance
-            }
-            synchronized(this){
-                val instance = Room.databaseBuilder(
+        fun getAppDBInstance(context: Context): FacturaDatabase {
+            if (DB_INSTANCE == null) {
+                DB_INSTANCE = Room.databaseBuilder(
                     context.applicationContext,
                     FacturaDatabase::class.java,
-                    "factura_database"
-                ).build()
-                INSTANCE = instance
-                return instance
+                    "invoice_database"
+                )
+                    .allowMainThreadQueries()
+                    .build()
             }
+            return DB_INSTANCE!!
         }
     }
 }
