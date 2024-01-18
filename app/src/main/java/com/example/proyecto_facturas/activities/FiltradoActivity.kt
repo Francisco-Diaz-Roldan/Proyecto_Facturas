@@ -2,6 +2,7 @@ package com.example.proyecto_facturas.activities
 
 import android.app.DatePickerDialog
 import android.content.Intent
+import android.icu.text.SimpleDateFormat
 import android.icu.util.Calendar
 import android.os.Bundle
 import android.util.Log
@@ -19,6 +20,7 @@ import com.example.proyecto_facturas.R
 import com.example.proyecto_facturas.databinding.ActivityFiltradoBinding
 import com.example.proyecto_facturas.data.rom.Factura
 import java.util.Date
+import java.util.Locale
 
 class FiltradoActivity : AppCompatActivity() {
 
@@ -49,12 +51,13 @@ class FiltradoActivity : AppCompatActivity() {
         //Para el botón desde
         btnDesde = binding.btnDesde
         btnDesde.setOnClickListener {
-            obtenerFecha(binding.btnDesde, true, false)
+            obtenerFecha(btnDesde, restriccionMinDate = true)
         }
-        //Para el botón hasta
+
+        //Para el botón hasta ( fecha mínima)
         btnHasta = binding.btnHasta
         btnHasta.setOnClickListener {
-            obtenerFecha(binding.btnHasta, true, false)
+            obtenerFecha(btnHasta, restriccionMinDate = true, fechaMinima = obtenerFechaDesde())
         }
         //Para la seekbar
         //Recibo el valor máximo de las facturas de la ventana anterior y lo redondeo
@@ -104,6 +107,8 @@ class FiltradoActivity : AppCompatActivity() {
         supportActionBar?.title = "Filtrar facturas"
     }
 
+
+
     private fun resetearFecha() {
         btnDesde.text = getString(R.string.dia_mes_ano)
         btnHasta.text = getString(R.string.dia_mes_ano)
@@ -138,7 +143,10 @@ class FiltradoActivity : AppCompatActivity() {
     }
 
     private fun obtenerFecha(
-        button: Button, restriccionMaxDate: Boolean = false, restriccionMinDate: Boolean = false
+        button: Button,
+        restriccionMaxDate: Boolean = false,
+        restriccionMinDate: Boolean = false,
+        fechaMinima: Long? = null // Nueva parametro para la fecha mínima
     ) {
         val calendario = Calendar.getInstance()
         val anno = calendario.get(Calendar.YEAR)
@@ -153,7 +161,9 @@ class FiltradoActivity : AppCompatActivity() {
 
         // Establezco las fechas mínimas y máximas
         if (restriccionMinDate) {
-            datePickerDialog.datePicker.minDate = calendario.timeInMillis
+            fechaMinima?.let {
+                datePickerDialog.datePicker.minDate = it
+            }
         }
 
         if (restriccionMaxDate) {
@@ -161,6 +171,25 @@ class FiltradoActivity : AppCompatActivity() {
         }
         datePickerDialog.show()
     }
+
+    private fun obtenerFechaDesde(): Long {
+        val formato = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+
+        // Obtiene la fecha desde tu botón o desde cualquier otro lugar donde almacenes la fecha seleccionada
+        val fechaDesdeTexto = btnDesde.text.toString()
+
+        try {
+            // Parsea la fecha y devuelve el tiempo en milisegundos
+            val fechaDesde = formato.parse(fechaDesdeTexto)
+            return fechaDesde?.time ?: 0L
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        // En caso de error, devuelve 0L o algún valor predeterminado
+        return 0L
+    }
+
 
     private fun calcularValorActualSeekbar(maxImporte: Int) {
         //Seekbar y textos de la seekbar

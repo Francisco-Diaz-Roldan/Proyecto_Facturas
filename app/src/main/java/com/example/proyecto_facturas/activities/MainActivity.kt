@@ -84,7 +84,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun initMainViewModel() {
+    private fun initMainViewModel() {//Inicializa la vista(ViewModel) y la lista de facturas y actualizar la interfaz de usuario
         val viewModel = ViewModelProvider(this).get(FacturaViewModel::class.java)
         viewModel.getAllRepositoryList().observe(this, Observer<List<Factura>> {
             //TODO Usar un preferencias compartidas para almacenar los datos filtrados
