@@ -1,6 +1,8 @@
 package com.example.proyecto_facturas.activities
 
+import android.annotation.SuppressLint
 import android.content.Intent
+import android.icu.text.SimpleDateFormat
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -12,12 +14,16 @@ import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.proyecto_facturas.Filtro
 import com.example.proyecto_facturas.R
 import com.example.proyecto_facturas.adapter.FacturaAdapter
 import com.example.proyecto_facturas.databinding.ActivityMainBinding
 import com.example.proyecto_facturas.data.rom.Factura
 import com.example.proyecto_facturas.viewmodel.FacturaViewModel
+import com.google.gson.Gson
 import dagger.hilt.android.AndroidEntryPoint
+import java.util.Date
+import java.util.Locale
 
 
 @AndroidEntryPoint
@@ -37,44 +43,19 @@ class MainActivity : AppCompatActivity() {
 
         // Inicializo el adaptador
         inicializarAdapter()
-        // Inicializo RetrofitService
-        // retrofitServiceInterface = RetrofitServiceInterface.instance()
-
-        /*
-        val facturaViewModel = ViewModelProvider(this, FacturaViewModelFactory(application, retrofitService))
-            .get(FacturaViewModel::class.java)
-        facturaViewModel.getAllFacturas.observe(this, Observer { factura ->
-            adapter.setData(factura)
-        })
-        listaFactura = facturaViewModel
-
-
-
-        //Inicializo el Provider
-        //listaFactura = FacturaProvider.listaFacturas
-
-        // Inicializo el adaptador
-        adapter = FacturaAdapter(listaFactura) { factura ->
-            onItemSelected(factura)
-        }
-
-        // Configuro el RecyclerView con el adaptador
-        binding.rvFacturas.layoutManager = LinearLayoutManager(this)
-        binding.rvFacturas.adapter = FacturaAdapter(listaFactura) { factura -> onItemSelected(factura) }
-
-        // Configuro el ViewModel
-*/
-        initViewModel() //Inicializo la configuración del RecyclerView
+        //Inicializo la configuración del RecyclerView
+        initViewModel()
+        //Inicializa la vista(ViewModel) y las listas de facturas
         initMainViewModel()
 
-
+        //Aquí m
+        //TODO seguir por aqui
 
         this.onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 finish()
             }
         })
-
         setToolbar()
     }
 
@@ -84,20 +65,44 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun initMainViewModel() {//Inicializa la vista(ViewModel) y la lista de facturas y actualizar la interfaz de usuario
+    @SuppressLint("NotifyDataSetChanged")
+    private fun initMainViewModel() {
         val viewModel = ViewModelProvider(this).get(FacturaViewModel::class.java)
         viewModel.getAllRepositoryList().observe(this, Observer<List<Factura>> {
-            //TODO Usar un preferencias compartidas para almacenar los datos filtrados
-
-            facturaAdapter.setData(it)
+            facturaAdapter.setListaFacturas(it)
             facturaAdapter.notifyDataSetChanged()
-
             if (it.isEmpty()) {
                 viewModel.llamarApi()
                 Log.d("Datos", it.toString())
             }
+            //TODO Usar un preferencias compartidas para almacenar los datos filtrados
+
+            //Para Filtrar los datos. Obtenemos los datos de la actividad FiltradoActivity
+            var datosFiltrados = intent.getStringExtra("datosFiltrados")
+            Log.d("hoa2", datosFiltrados.toString())
+            if (datosFiltrados != null){
+               // Convierte strings JSON (datosFiltrados) en objeto  de tipo Filtro utilizando Gson
+                var filtrosAplicados = Gson().fromJson(datosFiltrados, Filtro::class.java)
+                Log.d("holaaaaaaa", filtrosAplicados.toString())
+                var listaFactura = it
+
+                //Aplicamos los filtros de fecha
+                listaFactura = comprobarFechaFiltrado(filtrosAplicados.fechaDesde, filtrosAplicados.fechaHasta, listaFactura)
+                Log.d("FiltroFecha", listaFactura.toString())
+                //Aplicamos los filtros de importe
+                Log.d("FiltroImporte", listaFactura.toString())
+                listaFactura = comprobarImporteFiltrado(filtrosAplicados.importe, listaFactura)
+                //Aplicamos los filtros de estado de las checkBoxes
+                listaFactura = comprobarEstadoPagoFiltrado(filtrosAplicados.estado, listaFactura)
+                Log.d("FiltroEstado", listaFactura.toString())
+
+                //Mostramos por pantalla la lista filtrada
+                facturaAdapter.setListaFacturas(listaFactura)
+            }
+
+            //Para el valor máximo de la lista
+            valorMax = calcularMaximo(it)
         })
-        valorMax = calcularMaximo()
     }
 
     private fun initViewModel() {
@@ -108,10 +113,86 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setToolbar() {
-        //Declaro el valor máximo que le pasaré a la Toolbar
-        valorMax = calcularMaximo()
+    // Para los filtros de la fecha
+    private fun comprobarFechaFiltrado(fechaDesdeStr: String, fechaHastaStr: String, listaFacturas: List<Factura>): List<Factura> {
+        // Creo una segunda lista para devolverla despues con los datos filtrados
+        val listaFiltradaPorFecha = ArrayList<Factura>()
 
+        //En caso de que se haya modificado la fecha en la pantalla de fitrado
+        if (fechaDesdeStr != getString(R.string.dia_mes_ano) && fechaHastaStr != getString(R.string.dia_mes_ano)) {
+            val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+
+            val fechaDesde: Date? = sdf.parse(fechaDesdeStr)
+            val fechaHasta: Date? = sdf.parse(fechaHastaStr)
+
+            //Añado a la lista lista filtrada las fechas comprendidas entre el rango de dias desde y hasta
+            for (factura in listaFacturas) {
+                val fecha = sdf.parse(factura.fecha)!!
+                if (fecha.after(fechaDesde) && fecha.before(fechaHasta)) {
+                    listaFiltradaPorFecha.add(factura)
+                }
+            }
+        //Si no se ha modificado la lista en la pantalla de filtros devuelve la lista original
+        } else {
+            return listaFacturas
+        }
+        return listaFiltradaPorFecha //Devuelvo la lista filtrada por fecha
+    }
+
+    //Para filtrar por importe
+    private fun comprobarImporteFiltrado(importe: Double, facturaList: List<Factura>):List<Factura>{
+        // Creo una segunda lista para devolverla despues con los datos filtrados
+        val listaFiltradaPorImporte = ArrayList<Factura>()
+        // Si el importe de la factura es menor o igual que el seleccionado se añade a la lista
+        for (factura in listaFactura){
+            if (factura.importeOrdenacion!! <= importe){
+                listaFiltradaPorImporte.add(factura)
+            }
+        }
+        return listaFiltradaPorImporte
+    }
+
+    //Para filtrar por las checkboxes (estado de pago)
+    private fun comprobarEstadoPagoFiltrado(estado:HashMap<String, Boolean>,
+                                            listaFactura: List<Factura>):List<Factura>{
+        // Creo una segunda lista para devolverla despues con los datos filtrados
+        val listaFiltradaPorImporte = ArrayList<Factura>()
+
+        //Declaro las checkBoxes (recibe el texto)
+        val chBoxPagadas = estado[getString(R.string.pagadas)] ?: false
+        val chBoxAnuladas = estado[getString(R.string.anuladas)] ?: false
+        val chBoxCuotaFija = estado[getString(R.string.cuota_fija)] ?: false
+        val chBoxPendientesPago = estado[getString(R.string.pendientes_de_pago)] ?: false
+        val chBoxPlanPago = estado[getString(R.string.plan_de_pago)] ?: false
+        Log.d("amorcito", listaFiltradaPorImporte.toString())
+
+        //En caso de no haber seleccionado ninguna checkbox
+        if (!chBoxPagadas && !chBoxAnuladas && !chBoxCuotaFija && !chBoxPendientesPago
+            && !chBoxPlanPago) {
+            return listaFactura
+        }
+        Log.d("amorcito2", listaFactura.toString())
+        // Comprobamos el estado de cada checkbox con respecto al JSON, no con respecto a los Strings/Constantes
+        for (factura in listaFactura){
+            val estadoFactura = factura.descEstado
+            val estaPagada = estadoFactura == "Pagada"// == getString(R.string.pagadas)
+            val estaAnulada = estadoFactura == "Anuladas"// == getString(R.string.anuladas)
+            val estaCuotaFija = estadoFactura == "Cuota Fija"// == getString(R.string.cuota_fija)
+            val estaPendientePago = estadoFactura == "Pendiente de pago"// == getString(R.string.pendientes_de_pago)
+            val estaPlanPago = estadoFactura =="Plan de Pago"// == getString(R.string.plan_de_pago)
+
+            // Comprobamos si el estado de la factura coincide con alguna checkbox seleccionada
+            if ((estaPagada && chBoxPagadas) || (estaAnulada && chBoxAnuladas) ||
+                (estaCuotaFija && chBoxCuotaFija) || (estaPendientePago && chBoxPendientesPago) ||
+                (estaPlanPago && chBoxPlanPago)) {
+                //Si coincide, la añadimos a la lista filtrada por importe
+                listaFiltradaPorImporte.add(factura)
+            }
+        }
+        return listaFiltradaPorImporte
+    }
+
+    private fun setToolbar() {
         // Configuro la toolbar genérica
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -121,7 +202,7 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    private fun calcularMaximo(): Double {
+    private fun calcularMaximo(listaFactura: List<Factura>): Double {
         var importeMaximo = 0.0
         for (factura in listaFactura) {
             val facturaActual = factura.importeOrdenacion

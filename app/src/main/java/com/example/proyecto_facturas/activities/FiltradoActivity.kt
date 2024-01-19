@@ -14,11 +14,14 @@ import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import com.example.proyecto_facturas.Filtro
 import com.example.proyecto_facturas.R
 import com.example.proyecto_facturas.databinding.ActivityFiltradoBinding
 import com.example.proyecto_facturas.data.rom.Factura
+import com.google.gson.Gson
 import java.util.Date
 import java.util.Locale
 
@@ -46,8 +49,7 @@ class FiltradoActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityFiltradoBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        //Para la lista de facturas
-        //listaFactura = FacturaProvider.listaFacturas
+
         //Para el botón desde
         btnDesde = binding.btnDesde
         btnDesde.setOnClickListener {
@@ -57,8 +59,13 @@ class FiltradoActivity : AppCompatActivity() {
         //Para el botón hasta ( fecha mínima)
         btnHasta = binding.btnHasta
         btnHasta.setOnClickListener {
-            obtenerFecha(btnHasta, restriccionMinDate = true, fechaMinima = obtenerFechaDesde())
+            if (btnDesde.text.toString() == getString(R.string.dia_mes_ano)) {
+                mostrarAlertDialog()
+            } else {
+                obtenerFecha(btnHasta, restriccionMinDate = true, fechaMinima = obtenerFechaDesde())
+            }
         }
+
         //Para la seekbar
         //Recibo el valor máximo de las facturas de la ventana anterior y lo redondeo
         val valorMax = intent.getDoubleExtra("valorMax", 0.0).toInt() + 1
@@ -95,7 +102,27 @@ class FiltradoActivity : AppCompatActivity() {
         //Para el boton de aplicar filtros
         btnAplicar = binding.btnAplicar
         btnAplicar.setOnClickListener {
-            //TODO
+            val gson = Gson()
+            val intent = Intent(this, MainActivity::class.java)
+
+            val estadoCheckBox = hashMapOf(
+                getString(R.string.pagadas) to binding.checkboxPagada.isChecked,
+                getString(R.string.anuladas) to binding.checkboxAnuladas.isChecked,
+                getString(R.string.cuota_fija) to binding.checkboxCuotaFija.isChecked,
+                getString(R.string.pendientes_de_pago) to binding.checkboxPendientesDePago.isChecked,
+                getString(R.string.plan_de_pago) to binding.checkboxPlanDePago.isChecked
+            )
+
+            var fechaDesde = binding.btnDesde.text.toString()
+            var fechaHasta = binding.btnHasta.text.toString()
+            var importe = binding.seekbarImporte.progress.toDouble()
+
+            var filtro = Filtro(fechaHasta, fechaDesde, importe, estadoCheckBox)
+            Log.d("IntentFiltradoActivity", filtro.toString())
+            intent.putExtra("datosFiltrados", gson.toJson(filtro))
+
+            startActivity(intent)
+            Log.d("BtnAplicar", "El botón de aplicación de filtros funciona correctamente")
         }
 
 
@@ -107,6 +134,18 @@ class FiltradoActivity : AppCompatActivity() {
         supportActionBar?.title = "Filtrar facturas"
     }
 
+    private fun mostrarAlertDialog() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Alerta")
+        builder.setMessage("Por favor, selecciona primero la fecha Desde")
+
+        builder.setPositiveButton("Aceptar") { dialog, _ ->
+            dialog.dismiss()
+        }
+
+        val alertDialog = builder.create()
+        alertDialog.show()
+    }
 
 
     private fun resetearFecha() {
@@ -137,7 +176,6 @@ class FiltradoActivity : AppCompatActivity() {
                 startActivity(intent)
                 return true
             }
-
             else -> return super.onOptionsItemSelected(item)
         }
     }
@@ -146,7 +184,7 @@ class FiltradoActivity : AppCompatActivity() {
         button: Button,
         restriccionMaxDate: Boolean = false,
         restriccionMinDate: Boolean = false,
-        fechaMinima: Long? = null // Nueva parametro para la fecha mínima
+        fechaMinima: Long? = null // Nueva parametro para la fecha minima
     ) {
         val calendario = Calendar.getInstance()
         val anno = calendario.get(Calendar.YEAR)
@@ -175,18 +213,18 @@ class FiltradoActivity : AppCompatActivity() {
     private fun obtenerFechaDesde(): Long {
         val formato = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
 
-        // Obtiene la fecha desde tu botón o desde cualquier otro lugar donde almacenes la fecha seleccionada
+        // Obtengo la fecha desde  donde almaceno la fecha seleccionada
         val fechaDesdeTexto = btnDesde.text.toString()
 
         try {
-            // Parsea la fecha y devuelve el tiempo en milisegundos
+            // Parseo la fecha y devuelvo el tiempo en milisegundos
             val fechaDesde = formato.parse(fechaDesdeTexto)
             return fechaDesde?.time ?: 0L
         } catch (e: Exception) {
             e.printStackTrace()
         }
 
-        // En caso de error, devuelve 0L o algún valor predeterminado
+        // En caso de error devuelve el valor predeterminado
         return 0L
     }
 

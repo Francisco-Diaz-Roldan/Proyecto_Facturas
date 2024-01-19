@@ -34,7 +34,7 @@ class FacturaAdapter(
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun setData(factura: List<Factura>?){
+    fun setListaFacturas(factura: List<Factura>?){
         this.facturaLista = factura
         notifyDataSetChanged()
     }
