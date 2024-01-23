@@ -17,6 +17,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.proyecto_facturas.Filtro
 import com.example.proyecto_facturas.R
 import com.example.proyecto_facturas.adapter.FacturaAdapter
+import com.example.proyecto_facturas.constantes.Constantes.Companion.ANULADAS
+import com.example.proyecto_facturas.constantes.Constantes.Companion.CUOTA_FIJA
+import com.example.proyecto_facturas.constantes.Constantes.Companion.PAGADAS
+import com.example.proyecto_facturas.constantes.Constantes.Companion.PENDIENTES_DE_PAGO
+import com.example.proyecto_facturas.constantes.Constantes.Companion.PLAN_DE_PAGO
 import com.example.proyecto_facturas.databinding.ActivityMainBinding
 import com.example.proyecto_facturas.data.rom.Factura
 import com.example.proyecto_facturas.viewmodel.FacturaViewModel
@@ -140,7 +145,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     //Para filtrar por importe
-    private fun comprobarImporteFiltrado(importe: Double, facturaList: List<Factura>):List<Factura>{
+    private fun comprobarImporteFiltrado(importe: Double, listaFactura: List<Factura>):List<Factura>{
         // Creo una segunda lista para devolverla despues con los datos filtrados
         val listaFiltradaPorImporte = ArrayList<Factura>()
         // Si el importe de la factura es menor o igual que el seleccionado se añade a la lista
@@ -156,40 +161,38 @@ class MainActivity : AppCompatActivity() {
     private fun comprobarEstadoPagoFiltrado(estado:HashMap<String, Boolean>,
                                             listaFactura: List<Factura>):List<Factura>{
         // Creo una segunda lista para devolverla despues con los datos filtrados
-        val listaFiltradaPorImporte = ArrayList<Factura>()
+        val listaFiltradaPorEstado = ArrayList<Factura>()
 
         //Declaro las checkBoxes (recibe el texto)
-        val chBoxPagadas = estado[getString(R.string.pagadas)] ?: false
-        val chBoxAnuladas = estado[getString(R.string.anuladas)] ?: false
-        val chBoxCuotaFija = estado[getString(R.string.cuota_fija)] ?: false
-        val chBoxPendientesPago = estado[getString(R.string.pendientes_de_pago)] ?: false
-        val chBoxPlanPago = estado[getString(R.string.plan_de_pago)] ?: false
-        Log.d("amorcito", listaFiltradaPorImporte.toString())
+        val chBoxPagadas = estado[PAGADAS] ?: false
+        val chBoxAnuladas = estado[ANULADAS] ?: false
+        val chBoxCuotaFija = estado[CUOTA_FIJA] ?: false
+        val chBoxPendientesPago = estado[PENDIENTES_DE_PAGO] ?: false
+        val chBoxPlanPago = estado[PLAN_DE_PAGO] ?: false
 
         //En caso de no haber seleccionado ninguna checkbox
         if (!chBoxPagadas && !chBoxAnuladas && !chBoxCuotaFija && !chBoxPendientesPago
             && !chBoxPlanPago) {
             return listaFactura
         }
-        Log.d("amorcito2", listaFactura.toString())
         // Comprobamos el estado de cada checkbox con respecto al JSON, no con respecto a los Strings/Constantes
         for (factura in listaFactura){
             val estadoFactura = factura.descEstado
-            val estaPagada = estadoFactura == "Pagada"// == getString(R.string.pagadas)
-            val estaAnulada = estadoFactura == "Anuladas"// == getString(R.string.anuladas)
-            val estaCuotaFija = estadoFactura == "Cuota Fija"// == getString(R.string.cuota_fija)
-            val estaPendientePago = estadoFactura == "Pendiente de pago"// == getString(R.string.pendientes_de_pago)
-            val estaPlanPago = estadoFactura =="Plan de Pago"// == getString(R.string.plan_de_pago)
+            val estaPagada = estadoFactura == "Pagada"
+            val estaAnulada = estadoFactura == "Anuladas"
+            val estaCuotaFija = estadoFactura == "cuotaFija"
+            val estaPendientePago = estadoFactura == "Pendiente de pago"
+            val estaPlanPago = estadoFactura =="Plan de Pago"
 
             // Comprobamos si el estado de la factura coincide con alguna checkbox seleccionada
             if ((estaPagada && chBoxPagadas) || (estaAnulada && chBoxAnuladas) ||
                 (estaCuotaFija && chBoxCuotaFija) || (estaPendientePago && chBoxPendientesPago) ||
                 (estaPlanPago && chBoxPlanPago)) {
                 //Si coincide, la añadimos a la lista filtrada por importe
-                listaFiltradaPorImporte.add(factura)
+                listaFiltradaPorEstado.add(factura)
             }
         }
-        return listaFiltradaPorImporte
+        return listaFiltradaPorEstado
     }
 
     private fun setToolbar() {

@@ -19,6 +19,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.example.proyecto_facturas.Filtro
 import com.example.proyecto_facturas.R
+import com.example.proyecto_facturas.constantes.Constantes
 import com.example.proyecto_facturas.databinding.ActivityFiltradoBinding
 import com.example.proyecto_facturas.data.rom.Factura
 import com.google.gson.Gson
@@ -106,11 +107,11 @@ class FiltradoActivity : AppCompatActivity() {
             val intent = Intent(this, MainActivity::class.java)
 
             val estadoCheckBox = hashMapOf(
-                getString(R.string.pagadas) to binding.checkboxPagada.isChecked,
-                getString(R.string.anuladas) to binding.checkboxAnuladas.isChecked,
-                getString(R.string.cuota_fija) to binding.checkboxCuotaFija.isChecked,
-                getString(R.string.pendientes_de_pago) to binding.checkboxPendientesDePago.isChecked,
-                getString(R.string.plan_de_pago) to binding.checkboxPlanDePago.isChecked
+               Constantes.PAGADAS to binding.checkboxPagada.isChecked,
+               Constantes.ANULADAS to binding.checkboxAnuladas.isChecked,
+               Constantes.CUOTA_FIJA to binding.checkboxCuotaFija.isChecked,
+               Constantes.PENDIENTES_DE_PAGO to binding.checkboxPendientesDePago.isChecked,
+               Constantes.PLAN_DE_PAGO to binding.checkboxPlanDePago.isChecked
             )
 
             var fechaDesde = binding.btnDesde.text.toString()
