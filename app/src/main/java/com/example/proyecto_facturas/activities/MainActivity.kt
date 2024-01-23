@@ -7,9 +7,9 @@ import android.content.SharedPreferences
 import android.icu.text.SimpleDateFormat
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
@@ -37,9 +37,7 @@ import java.util.Locale
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    private var listaFactura: MutableList<Factura> = mutableListOf()
     private lateinit var binding: ActivityMainBinding
-    //private lateinit var intentLaunch: ActivityResultLauncher<Intent>
     private lateinit var facturaAdapter: FacturaAdapter
     private var valorMax: Double = 0.0
     private val preferenciasCompartidas: SharedPreferences by lazy {
@@ -59,17 +57,11 @@ class MainActivity : AppCompatActivity() {
         //Inicializa la vista(ViewModel) y las listas de facturas
         initMainViewModel()
 
-        //TODO seguir por aqui
-
         // Declaro las preferencias compartidas
         val listaFiltradaGuardada = obtenerListaFiltradaDesdePreferencias()
 
-        if (listaFiltradaGuardada != null) { // Si hay preferencias compartidas previas
-            facturaAdapter.setListaFacturas(listaFiltradaGuardada)
-        } else {
-            // No hay preferencias compartidas previas, configura el adaptador con una lista vacía o datos iniciales
-            facturaAdapter.setListaFacturas(emptyList()) // O configúralo con tus datos iniciales
-        }
+        // Si listaFiltradaGuardada no es nula establece la lista de facturas en el adaptador si no, usa emptyList() como valor predeterminado
+        facturaAdapter.setListaFacturas(listaFiltradaGuardada ?: emptyList())
 
         this.onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -114,6 +106,10 @@ class MainActivity : AppCompatActivity() {
 
                 // Guardo la lista filtrada en preferencias
                 guardarListaFiltradaEnPreferencias(listaFactura)
+
+                //Muestra un texto texto en caso de que la lista esté vacía
+                val tvVacio = binding.tvSinFacturas
+                tvVacio.visibility = if (listaFactura.isEmpty()) View.VISIBLE else View.GONE
 
                 //Muestro por pantalla la lista filtrada
                 facturaAdapter.setListaFacturas(listaFactura)
@@ -255,7 +251,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
-            //TODO  pasarle las preferencias compartidas
             R.id.menuFiltrar -> {
                 val intent = Intent(this, FiltradoActivity::class.java)
                 intent.putExtra("valorMax", valorMax)

@@ -19,4 +19,5 @@
     <string name="esta_funcionalidad_aun_no_esta_disponible">Esta funcionalidad aún no está disponible</string>
     <string name="cerrar">Cerrar</string>
     <string name="_0e">0€</string>
+    <string name="no_hay_facturas_disponibles">No hay facturas disponibles</string>
 </resources>
