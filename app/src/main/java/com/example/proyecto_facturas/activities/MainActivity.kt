@@ -1,7 +1,9 @@
 package com.example.proyecto_facturas.activities
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.icu.text.SimpleDateFormat
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -26,6 +28,7 @@ import com.example.proyecto_facturas.databinding.ActivityMainBinding
 import com.example.proyecto_facturas.data.rom.Factura
 import com.example.proyecto_facturas.viewmodel.FacturaViewModel
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.Date
 import java.util.Locale
@@ -39,7 +42,9 @@ class MainActivity : AppCompatActivity() {
     //private lateinit var intentLaunch: ActivityResultLauncher<Intent>
     private lateinit var facturaAdapter: FacturaAdapter
     private var valorMax: Double = 0.0
-    //private lateinit var retrofitServiceInterface: RetrofitServiceInterface
+    private val preferenciasCompartidas: SharedPreferences by lazy {
+        getSharedPreferences("preferencias_app", Context.MODE_PRIVATE)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,13 +53,23 @@ class MainActivity : AppCompatActivity() {
 
         // Inicializo el adaptador
         inicializarAdapter()
+
         //Inicializo la configuración del RecyclerView
         initViewModel()
         //Inicializa la vista(ViewModel) y las listas de facturas
         initMainViewModel()
 
-        //Aquí m
         //TODO seguir por aqui
+
+        // Declaro las preferencias compartidas
+        val listaFiltradaGuardada = obtenerListaFiltradaDesdePreferencias()
+
+        if (listaFiltradaGuardada != null) { // Si hay preferencias compartidas previas
+            facturaAdapter.setListaFacturas(listaFiltradaGuardada)
+        } else {
+            // No hay preferencias compartidas previas, configura el adaptador con una lista vacía o datos iniciales
+            facturaAdapter.setListaFacturas(emptyList()) // O configúralo con tus datos iniciales
+        }
 
         this.onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -74,13 +89,15 @@ class MainActivity : AppCompatActivity() {
     private fun initMainViewModel() {
         val viewModel = ViewModelProvider(this).get(FacturaViewModel::class.java)
         viewModel.getAllRepositoryList().observe(this, Observer<List<Factura>> {
+
+            //TODO Usar un preferencias compartidas para almacenar los datos filtrados
             facturaAdapter.setListaFacturas(it)
             facturaAdapter.notifyDataSetChanged()
+
             if (it.isEmpty()) {
                 viewModel.llamarApi()
                 Log.d("Datos", it.toString())
             }
-            //TODO Usar un preferencias compartidas para almacenar los datos filtrados
 
             //Para Filtrar los datos. Obtenemos los datos de la actividad FiltradoActivity
             var datosFiltrados = intent.getStringExtra("datosFiltrados")
@@ -88,23 +105,21 @@ class MainActivity : AppCompatActivity() {
             if (datosFiltrados != null){
                // Convierte strings JSON (datosFiltrados) en objeto  de tipo Filtro utilizando Gson
                 var filtrosAplicados = Gson().fromJson(datosFiltrados, Filtro::class.java)
-                Log.d("holaaaaaaa", filtrosAplicados.toString())
                 var listaFactura = it
 
-                //Aplicamos los filtros de fecha
+                //Aplico los filtros de fecha
                 listaFactura = comprobarFechaFiltrado(filtrosAplicados.fechaDesde, filtrosAplicados.fechaHasta, listaFactura)
-                Log.d("FiltroFecha", listaFactura.toString())
-                //Aplicamos los filtros de importe
-                Log.d("FiltroImporte", listaFactura.toString())
+                //Aplico los filtros de importe
                 listaFactura = comprobarImporteFiltrado(filtrosAplicados.importe, listaFactura)
-                //Aplicamos los filtros de estado de las checkBoxes
+                //Aplico los filtros de estado de las checkBoxes
                 listaFactura = comprobarEstadoPagoFiltrado(filtrosAplicados.estado, listaFactura)
-                Log.d("FiltroEstado", listaFactura.toString())
 
-                //Mostramos por pantalla la lista filtrada
+                // Guardo la lista filtrada en preferencias
+                guardarListaFiltradaEnPreferencias(listaFactura)
+
+                //Muestro por pantalla la lista filtrada
                 facturaAdapter.setListaFacturas(listaFactura)
             }
-
             //Para el valor máximo de la lista
             valorMax = calcularMaximo(it)
         })
@@ -242,6 +257,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
+            //TODO  pasarle las preferencias compartidas
             R.id.menuFiltrar -> {
                 val intent = Intent(this, FiltradoActivity::class.java)
                 intent.putExtra("valorMax", valorMax)
@@ -250,5 +266,22 @@ class MainActivity : AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    // Métodos para guardar y obtener la lista filtrada desde preferencias compartidas
+    private fun guardarListaFiltradaEnPreferencias(listaFiltrada: List<Factura>) {
+        val gson = Gson()
+        val listaFiltradaJson = gson.toJson(listaFiltrada)
+        preferenciasCompartidas.edit().putString("lista_filtrada", listaFiltradaJson).apply()
+    }
+
+    private fun obtenerListaFiltradaDesdePreferencias(): List<Factura>? {
+        val listaFiltradaJson = preferenciasCompartidas.getString("lista_filtrada", null)
+        if (listaFiltradaJson != null) {
+            val gson = Gson()
+            val tipoLista = object : TypeToken<List<Factura>>() {}.type
+            return gson.fromJson(listaFiltradaJson, tipoLista)
+        }
+        return null
     }
 }
