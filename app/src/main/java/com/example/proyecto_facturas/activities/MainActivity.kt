@@ -96,12 +96,10 @@ class MainActivity : AppCompatActivity() {
 
             if (it.isEmpty()) {
                 viewModel.llamarApi()
-                Log.d("Datos", it.toString())
             }
 
             //Para Filtrar los datos. Obtenemos los datos de la actividad FiltradoActivity
             var datosFiltrados = intent.getStringExtra("datosFiltrados")
-            Log.d("hoa2", datosFiltrados.toString())
             if (datosFiltrados != null){
                // Convierte strings JSON (datosFiltrados) en objeto  de tipo Filtro utilizando Gson
                 var filtrosAplicados = Gson().fromJson(datosFiltrados, Filtro::class.java)

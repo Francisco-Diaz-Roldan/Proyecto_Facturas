@@ -1,7 +1,9 @@
 package com.example.proyecto_facturas.activities
 
 import android.app.DatePickerDialog
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.icu.text.SimpleDateFormat
 import android.icu.util.Calendar
 import android.os.Bundle
@@ -19,7 +21,11 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.example.proyecto_facturas.Filtro
 import com.example.proyecto_facturas.R
-import com.example.proyecto_facturas.constantes.Constantes
+import com.example.proyecto_facturas.constantes.Constantes.Companion.ANULADAS
+import com.example.proyecto_facturas.constantes.Constantes.Companion.CUOTA_FIJA
+import com.example.proyecto_facturas.constantes.Constantes.Companion.PAGADAS
+import com.example.proyecto_facturas.constantes.Constantes.Companion.PENDIENTES_DE_PAGO
+import com.example.proyecto_facturas.constantes.Constantes.Companion.PLAN_DE_PAGO
 import com.example.proyecto_facturas.databinding.ActivityFiltradoBinding
 import com.example.proyecto_facturas.data.rom.Factura
 import com.google.gson.Gson
@@ -44,12 +50,18 @@ class FiltradoActivity : AppCompatActivity() {
     private lateinit var checkboxPlanDePago: CheckBox
     private lateinit var btnAplicar: Button
     private lateinit var btnEliminarFiltros: Button
+    private lateinit var preferenciasCompartidas: SharedPreferences
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityFiltradoBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+
+        // Inicializo las preferencias compartidas
+        preferenciasCompartidas = getSharedPreferences("preferencias_filtrado", Context.MODE_PRIVATE)
 
         //Para el botón desde
         btnDesde = binding.btnDesde
@@ -107,11 +119,11 @@ class FiltradoActivity : AppCompatActivity() {
             val intent = Intent(this, MainActivity::class.java)
 
             val estadoCheckBox = hashMapOf(
-               Constantes.PAGADAS to binding.checkboxPagada.isChecked,
-               Constantes.ANULADAS to binding.checkboxAnuladas.isChecked,
-               Constantes.CUOTA_FIJA to binding.checkboxCuotaFija.isChecked,
-               Constantes.PENDIENTES_DE_PAGO to binding.checkboxPendientesDePago.isChecked,
-               Constantes.PLAN_DE_PAGO to binding.checkboxPlanDePago.isChecked
+               PAGADAS to binding.checkboxPagada.isChecked,
+               ANULADAS to binding.checkboxAnuladas.isChecked,
+               CUOTA_FIJA to binding.checkboxCuotaFija.isChecked,
+               PENDIENTES_DE_PAGO to binding.checkboxPendientesDePago.isChecked,
+               PLAN_DE_PAGO to binding.checkboxPlanDePago.isChecked
             )
 
             var fechaDesde = binding.btnDesde.text.toString()
@@ -122,8 +134,8 @@ class FiltradoActivity : AppCompatActivity() {
             Log.d("IntentFiltradoActivity", filtro.toString())
             intent.putExtra("datosFiltrados", gson.toJson(filtro))
 
+            cargarPreferenciasCompartidas()
             startActivity(intent)
-            Log.d("BtnAplicar", "El botón de aplicación de filtros funciona correctamente")
         }
 
 
@@ -133,6 +145,8 @@ class FiltradoActivity : AppCompatActivity() {
 
         // Modifico el título de la barra de herramientas (toolbar)
         supportActionBar?.title = "Filtrar facturas"
+
+        aplicarFiltrosGuardados()
     }
 
     private fun mostrarAlertDialog() {
@@ -254,5 +268,58 @@ class FiltradoActivity : AppCompatActivity() {
                 Log.d("onStopTrackingTouch", "onStopTrackingTouch: algo ha fallado")
             }
         })
+    }
+
+    // Métodos para las preferencias compartidas
+    private fun guardarEstadoFiltro(filtro: Filtro) {
+        val preferencias = getSharedPreferences("preferencias_filtrado", Context.MODE_PRIVATE)
+        val gson = Gson()
+        val jsonFiltro = gson.toJson(filtro)
+        preferencias.edit().putString("ESTADO_FILTRO", jsonFiltro).apply()
+    }
+
+    private fun aplicarFiltrosGuardados() {
+        val preferencias = getSharedPreferences("preferencias_filtrado", Context.MODE_PRIVATE)
+        val jsonFiltro = preferencias.getString("ESTADO_FILTRO", null)
+
+        if (jsonFiltro != null) {
+            val gson = Gson()
+            val filtro = gson.fromJson(jsonFiltro, Filtro::class.java)
+            filtro?.let { filtroNoNulo ->
+                cargarFiltros(filtroNoNulo)
+            }
+        } else {
+            // No hay filtros previos almacenados, establecer valores predeterminados
+            val filtroPredeterminado = Filtro("fechaHasta", "fechaDesde", 0.0, hashMapOf())
+            cargarFiltros(filtroPredeterminado)
+        }
+    }
+
+    private fun cargarFiltros(filtro: Filtro) {
+        // Asegúrate de tener acceso a las vistas correspondientes desde esta función
+        btnDesde.text = filtro.fechaDesde
+        btnHasta.text = filtro.fechaHasta
+        seekbarImporte.progress = filtro.importe.toInt()
+        checkboxPagada.isChecked = filtro.estado[PAGADAS] ?: false
+        checkboxAnuladas.isChecked = filtro.estado[ANULADAS] ?: false
+        checkboxCuotaFija.isChecked = filtro.estado[CUOTA_FIJA] ?: false
+        checkboxPendientesDePago.isChecked = filtro.estado[PENDIENTES_DE_PAGO] ?: false
+        checkboxPlanDePago.isChecked = filtro.estado[PLAN_DE_PAGO] ?: false
+    }
+
+    private fun cargarPreferenciasCompartidas() {
+        val slider = seekbarImporte.progress.toDouble()
+        val checkBoxes = hashMapOf(
+            PAGADAS to checkboxPagada.isChecked,
+            ANULADAS to checkboxAnuladas.isChecked,
+            CUOTA_FIJA to checkboxCuotaFija.isChecked,
+            PENDIENTES_DE_PAGO to checkboxPendientesDePago.isChecked,
+            PLAN_DE_PAGO to checkboxPlanDePago.isChecked
+        )
+        val fechaMinima = btnDesde.text.toString()
+        val fechaMaxima = btnHasta.text.toString()
+        val filtro = Filtro(fechaMaxima, fechaMinima, slider, checkBoxes)
+
+        guardarEstadoFiltro(filtro)
     }
 }
