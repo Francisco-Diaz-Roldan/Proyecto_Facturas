@@ -1,5 +1,6 @@
 package com.example.proyecto_facturas.activities
 
+import android.annotation.SuppressLint
 import android.app.DatePickerDialog
 import android.content.Context
 import android.content.Intent
@@ -15,7 +16,6 @@ import android.widget.CheckBox
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
-import androidx.activity.result.ActivityResultLauncher
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -27,16 +27,13 @@ import com.example.proyecto_facturas.constantes.Constantes.Companion.PAGADAS
 import com.example.proyecto_facturas.constantes.Constantes.Companion.PENDIENTES_DE_PAGO
 import com.example.proyecto_facturas.constantes.Constantes.Companion.PLAN_DE_PAGO
 import com.example.proyecto_facturas.databinding.ActivityFiltradoBinding
-import com.example.proyecto_facturas.data.rom.Factura
 import com.google.gson.Gson
 import java.util.Date
 import java.util.Locale
 
 class FiltradoActivity : AppCompatActivity() {
 
-    private lateinit var listaFactura: MutableList<Factura>
     private lateinit var binding: ActivityFiltradoBinding
-    private lateinit var intentLaunch: ActivityResultLauncher<Intent>
     private lateinit var btnDesde: Button
     private lateinit var btnHasta: Button
     private lateinit var tvMinImporte: TextView
@@ -48,10 +45,7 @@ class FiltradoActivity : AppCompatActivity() {
     private lateinit var checkboxCuotaFija: CheckBox
     private lateinit var checkboxPendientesDePago: CheckBox
     private lateinit var checkboxPlanDePago: CheckBox
-    private lateinit var btnAplicar: Button
-    private lateinit var btnEliminarFiltros: Button
     private lateinit var preferenciasCompartidas: SharedPreferences
-
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,9 +53,9 @@ class FiltradoActivity : AppCompatActivity() {
         binding = ActivityFiltradoBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-
         // Inicializo las preferencias compartidas
-        preferenciasCompartidas = getSharedPreferences("preferencias_filtrado", Context.MODE_PRIVATE)
+        preferenciasCompartidas = getSharedPreferences("preferencias_filtrado",
+            Context.MODE_PRIVATE)
 
         //Para el botón desde
         btnDesde = binding.btnDesde
@@ -79,7 +73,20 @@ class FiltradoActivity : AppCompatActivity() {
             }
         }
 
-        //Para la seekbar
+        configurarSeekbar()
+
+        configurarCheckBoxes()
+
+        configurarBotonEliminarFiltros()
+
+        configurarBotonAplicarFiltros()
+
+        configurarToolbar()
+
+        aplicarFiltrosGuardados()
+    }
+
+    private fun configurarSeekbar() {
         //Recibo el valor máximo de las facturas de la ventana anterior y lo redondeo
         val valorMax = intent.getDoubleExtra("valorMax", 0.0).toInt() + 1
 
@@ -89,21 +96,47 @@ class FiltradoActivity : AppCompatActivity() {
         tvMinImporte = binding.tvMinImporte
         tvMaxImporte = binding.tvMaxImporte
         tvImporteActual = binding.tvImporteActual
-        tvMinImporte.text = getString(R.string.`_0e`)
-        tvImporteActual.text = getString(R.string.`_0e`)
+        tvMinImporte.text = getString(R.string._0e)
+        tvImporteActual.text = getString(R.string._0e)
+
         calcularValorActualSeekbar(valorMax)
+    }
 
-        //Para las checkboxes
-        checkboxPagada = binding.checkboxPagada
-        checkboxAnuladas = binding.checkboxAnuladas
-        checkboxCuotaFija = binding.checkboxCuotaFija
-        checkboxPendientesDePago = binding.checkboxPendientesDePago
-        checkboxPlanDePago = binding.checkboxPlanDePago
+    private fun configurarToolbar() {
+        val toolbar = findViewById<Toolbar>(R.id.toolbar)
+        setSupportActionBar(toolbar)
 
+        // Modifico el título de la barra de herramientas (toolbar)
+        supportActionBar?.title = "Filtrar facturas"
+    }
 
-        //Para el boton de eliminar filtros
-        btnEliminarFiltros = binding.btnEliminarFiltros
-        btnEliminarFiltros.setOnClickListener {
+    private fun configurarBotonAplicarFiltros() {
+        binding.btnAplicar.setOnClickListener {
+            val gson = Gson()
+            val intent = Intent(this, MainActivity::class.java)
+
+            val estadoCheckBox = hashMapOf(
+                PAGADAS to binding.checkboxPagada.isChecked,
+                ANULADAS to binding.checkboxAnuladas.isChecked,
+                CUOTA_FIJA to binding.checkboxCuotaFija.isChecked,
+                PENDIENTES_DE_PAGO to binding.checkboxPendientesDePago.isChecked,
+                PLAN_DE_PAGO to binding.checkboxPlanDePago.isChecked
+            )
+
+            val fechaDesde = binding.btnDesde.text.toString()
+            val fechaHasta = binding.btnHasta.text.toString()
+            val importe = binding.seekbarImporte.progress.toDouble()
+
+            val filtro = Filtro(fechaHasta, fechaDesde, importe, estadoCheckBox)
+            intent.putExtra("datosFiltrados", gson.toJson(filtro))
+
+            cargarPreferenciasCompartidas()
+            startActivity(intent)
+        }
+    }
+
+    private fun configurarBotonEliminarFiltros() {
+        binding.btnEliminarFiltros.setOnClickListener {
             //Para restablecer los valores de texto de los botones con las fechas
             resetearFecha()
             //Para restablecer el valor de la seekbar a 0
@@ -111,42 +144,14 @@ class FiltradoActivity : AppCompatActivity() {
             //Para restablecer los valores de las checkboxes
             resetearCheckBoxes()
         }
+    }
 
-        //Para el boton de aplicar filtros
-        btnAplicar = binding.btnAplicar
-        btnAplicar.setOnClickListener {
-            val gson = Gson()
-            val intent = Intent(this, MainActivity::class.java)
-
-            val estadoCheckBox = hashMapOf(
-               PAGADAS to binding.checkboxPagada.isChecked,
-               ANULADAS to binding.checkboxAnuladas.isChecked,
-               CUOTA_FIJA to binding.checkboxCuotaFija.isChecked,
-               PENDIENTES_DE_PAGO to binding.checkboxPendientesDePago.isChecked,
-               PLAN_DE_PAGO to binding.checkboxPlanDePago.isChecked
-            )
-
-            var fechaDesde = binding.btnDesde.text.toString()
-            var fechaHasta = binding.btnHasta.text.toString()
-            var importe = binding.seekbarImporte.progress.toDouble()
-
-            var filtro = Filtro(fechaHasta, fechaDesde, importe, estadoCheckBox)
-            Log.d("IntentFiltradoActivity", filtro.toString())
-            intent.putExtra("datosFiltrados", gson.toJson(filtro))
-
-            cargarPreferenciasCompartidas()
-            startActivity(intent)
-        }
-
-
-        // Configuro la toolbar
-        val toolbar = findViewById<Toolbar>(R.id.toolbar)
-        setSupportActionBar(toolbar)
-
-        // Modifico el título de la barra de herramientas (toolbar)
-        supportActionBar?.title = "Filtrar facturas"
-
-        aplicarFiltrosGuardados()
+    private fun configurarCheckBoxes() {
+        checkboxPagada = binding.checkboxPagada
+        checkboxAnuladas = binding.checkboxAnuladas
+        checkboxCuotaFija = binding.checkboxCuotaFija
+        checkboxPendientesDePago = binding.checkboxPendientesDePago
+        checkboxPlanDePago = binding.checkboxPlanDePago
     }
 
     private fun mostrarAlertDialog() {
@@ -169,7 +174,8 @@ class FiltradoActivity : AppCompatActivity() {
     }
 
     private fun resetearSeekbar(){
-        seekbarImporte.progress = 0
+        val valorMax = intent.getDoubleExtra("valorMax", 0.0).toInt() + 1
+        seekbarImporte.progress = valorMax
     }
 
     private fun resetearCheckBoxes(){
@@ -187,8 +193,7 @@ class FiltradoActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.menuCerrar -> {
-                val intent = Intent(this, MainActivity::class.java)
-                startActivity(intent)
+                finish()
                 return true
             }
             else -> return super.onOptionsItemSelected(item)
@@ -213,13 +218,11 @@ class FiltradoActivity : AppCompatActivity() {
         )
 
         // Establezco las fechas mínimas y máximas
-        if (restriccionMinDate) {
-            fechaMinima?.let {
-                datePickerDialog.datePicker.minDate = it
-            }
+        restriccionMinDate?.let {
+            datePickerDialog.datePicker.minDate = fechaMinima ?: 0
         }
 
-        if (restriccionMaxDate) {
+        restriccionMaxDate?.let {
             datePickerDialog.datePicker.maxDate = Date().time
         }
         datePickerDialog.show()
@@ -238,12 +241,10 @@ class FiltradoActivity : AppCompatActivity() {
         } catch (e: Exception) {
             e.printStackTrace()
         }
-
-        // En caso de error devuelve el valor predeterminado
-        return 0L
+        return 0L // En caso de error devuelve el valor predeterminado
     }
 
-
+    @SuppressLint("SetTextI18n")
     private fun calcularValorActualSeekbar(maxImporte: Int) {
         //Seekbar y textos de la seekbar
         val seekbarImporte = findViewById<SeekBar>(R.id.seekbarImporte)
@@ -290,7 +291,8 @@ class FiltradoActivity : AppCompatActivity() {
             }
         } else {
             // No hay filtros previos almacenados, establecer valores predeterminados
-            val filtroPredeterminado = Filtro("fechaHasta", "fechaDesde", 0.0, hashMapOf())
+            val filtroPredeterminado = Filtro("fechaHasta", "fechaDesde",
+                0.0, hashMapOf())
             cargarFiltros(filtroPredeterminado)
         }
     }
@@ -319,7 +321,6 @@ class FiltradoActivity : AppCompatActivity() {
         val fechaMinima = btnDesde.text.toString()
         val fechaMaxima = btnHasta.text.toString()
         val filtro = Filtro(fechaMaxima, fechaMinima, slider, checkBoxes)
-
         guardarEstadoFiltro(filtro)
     }
 }

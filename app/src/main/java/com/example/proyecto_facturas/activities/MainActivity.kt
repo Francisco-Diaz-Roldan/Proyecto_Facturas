@@ -5,15 +5,14 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.icu.text.SimpleDateFormat
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -25,8 +24,8 @@ import com.example.proyecto_facturas.constantes.Constantes.Companion.CUOTA_FIJA
 import com.example.proyecto_facturas.constantes.Constantes.Companion.PAGADAS
 import com.example.proyecto_facturas.constantes.Constantes.Companion.PENDIENTES_DE_PAGO
 import com.example.proyecto_facturas.constantes.Constantes.Companion.PLAN_DE_PAGO
-import com.example.proyecto_facturas.databinding.ActivityMainBinding
 import com.example.proyecto_facturas.data.rom.Factura
+import com.example.proyecto_facturas.databinding.ActivityMainBinding
 import com.example.proyecto_facturas.viewmodel.FacturaViewModel
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -41,6 +40,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var facturaAdapter: FacturaAdapter
     private var valorMax: Double = 0.0
+    private  var filtro: Filtro? = null
     private val preferenciasCompartidas: SharedPreferences by lazy {
         getSharedPreferences("preferencias_app", Context.MODE_PRIVATE)
     }
@@ -50,32 +50,30 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Inicializo el adaptador
         inicializarAdapter()
 
-        //Inicializo la configuración del RecyclerView
         inicializarViewModel()
 
-        //Inicializo el DividerDecoration
         inicializarDividerDecoration()
 
-        //Inicializa la vista(ViewModel) y las listas de facturas
         inicializarMainViewModel()
 
+        configurarFacturaAdapter()
+
+        configurarToolbar()
+    }
+
+    private fun configurarFacturaAdapter() {
         // Declaro las preferencias compartidas
         val listaFiltradaGuardada = obtenerListaFiltradaDesdePreferencias()
 
-        // Si listaFiltradaGuardada no es nula establece la lista de facturas en el adaptador si no,
-        // usa emptyList() como valor predeterminado
         facturaAdapter.setListaFacturas(listaFiltradaGuardada ?: emptyList())
 
-        this.onBackPressedDispatcher.addCallback(this, object :
-            OnBackPressedCallback(true) {
+        this.onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 finish()
             }
         })
-        setToolbar()
     }
 
     private fun inicializarDividerDecoration() {
@@ -94,11 +92,12 @@ class MainActivity : AppCompatActivity() {
 
     @SuppressLint("NotifyDataSetChanged")
     private fun inicializarMainViewModel() {
+        //Inicializa la vista(ViewModel) y las listas de facturas
         val viewModel = ViewModelProvider(this).get(FacturaViewModel::class.java)
-        viewModel.getAllRepositoryList().observe(this, Observer<List<Factura>> {
+        viewModel.getAllRepositoryList().observe(this){
 
             facturaAdapter.setListaFacturas(it)
-            facturaAdapter.notifyDataSetChanged()
+            //facturaAdapter.notifyDataSetChanged()
 
             if (it.isEmpty()) {
                 viewModel.llamarApi()
@@ -135,10 +134,11 @@ class MainActivity : AppCompatActivity() {
             }
             //Para el valor máximo de la lista
             valorMax = calcularMaximo(it)
-        })
+        }
     }
 
     private fun inicializarViewModel() {
+        //Inicializo la configuración del RecyclerView
         binding.rvFacturas.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
             inicializarAdapter()
@@ -233,7 +233,7 @@ class MainActivity : AppCompatActivity() {
         return listaFiltradaPorEstado
     }
 
-    private fun setToolbar() {
+    private fun configurarToolbar() {
         // Configuro la toolbar genérica
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
@@ -254,6 +254,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_filtros, menu)
+
         return true
     }
 
@@ -283,6 +284,10 @@ class MainActivity : AppCompatActivity() {
             R.id.menuFiltrar -> {
                 val intent = Intent(this, FiltradoActivity::class.java)
                 intent.putExtra("valorMax", valorMax)
+                if (filtro !=null){
+                    var gson = Gson()
+                    intent.putExtra("datosFiltrados", gson.toJson(filtro))
+                }
                 startActivity(intent)
                 true
             }
