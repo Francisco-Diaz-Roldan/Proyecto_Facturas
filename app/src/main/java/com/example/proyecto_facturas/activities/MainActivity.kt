@@ -50,32 +50,30 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Inicializo el adaptador
         inicializarAdapter()
 
-        //Inicializo la configuración del RecyclerView
         inicializarViewModel()
 
-        //Inicializo el DividerDecoration
         inicializarDividerDecoration()
 
-        //Inicializa la vista(ViewModel) y las listas de facturas
         inicializarMainViewModel()
 
+        configurarFacturaAdapter()
+
+        configurarToolbar()
+    }
+
+    private fun configurarFacturaAdapter() {
         // Declaro las preferencias compartidas
         val listaFiltradaGuardada = obtenerListaFiltradaDesdePreferencias()
 
-        // Si listaFiltradaGuardada no es nula establece la lista de facturas en el adaptador si no,
-        // usa emptyList() como valor predeterminado
         facturaAdapter.setListaFacturas(listaFiltradaGuardada ?: emptyList())
 
-        this.onBackPressedDispatcher.addCallback(this, object :
-            OnBackPressedCallback(true) {
+        this.onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 finish()
             }
         })
-        setToolbar()
     }
 
     private fun inicializarDividerDecoration() {
@@ -94,8 +92,9 @@ class MainActivity : AppCompatActivity() {
 
     @SuppressLint("NotifyDataSetChanged")
     private fun inicializarMainViewModel() {
+        //Inicializa la vista(ViewModel) y las listas de facturas
         val viewModel = ViewModelProvider(this).get(FacturaViewModel::class.java)
-        viewModel.getAllRepositoryList().observe(this, Observer<List<Factura>> {
+        viewModel.getAllRepositoryList().observe(this){
 
             facturaAdapter.setListaFacturas(it)
             facturaAdapter.notifyDataSetChanged()
@@ -135,10 +134,11 @@ class MainActivity : AppCompatActivity() {
             }
             //Para el valor máximo de la lista
             valorMax = calcularMaximo(it)
-        })
+        }
     }
 
     private fun inicializarViewModel() {
+        //Inicializo la configuración del RecyclerView
         binding.rvFacturas.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
             inicializarAdapter()
@@ -233,7 +233,7 @@ class MainActivity : AppCompatActivity() {
         return listaFiltradaPorEstado
     }
 
-    private fun setToolbar() {
+    private fun configurarToolbar() {
         // Configuro la toolbar genérica
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
