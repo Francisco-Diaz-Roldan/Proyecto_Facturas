@@ -5,16 +5,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.MainActivity">
+    tools:context=".activities.MainActivity" >
 
     <include
         android:id="@+id/includeMainActivity"
-        layout="@layout/toolbar_generica"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        layout="@layout/toolbar_generica" />
 
     <TextView
         android:id="@+id/tvSinFacturas"
@@ -37,6 +37,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/includeMainActivity"/>
+        app:layout_constraintTop_toBottomOf="@+id/includeMainActivity" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

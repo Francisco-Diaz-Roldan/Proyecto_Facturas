@@ -28,7 +28,6 @@ import com.example.proyecto_facturas.constantes.Constantes.Companion.PENDIENTES_
 import com.example.proyecto_facturas.constantes.Constantes.Companion.PLAN_DE_PAGO
 import com.example.proyecto_facturas.databinding.ActivityFiltradoBinding
 import com.google.gson.Gson
-import java.util.Date
 import java.util.Locale
 
 class FiltradoActivity : AppCompatActivity() {
@@ -78,8 +77,10 @@ class FiltradoActivity : AppCompatActivity() {
             if (btnDesde.text.toString() == getString(R.string.dia_mes_ano)) {
                 mostrarAlertDialog()
             } else {
-                obtenerFecha(btnHasta, restriccionMinDate = true, restriccionMaxDate = true,
-                    fechaMinima = obtenerFechaDesde())
+                obtenerFecha(
+                    btnHasta, restriccionMinDate = true, restriccionMaxDate = true,
+                    fechaMinima = obtenerFechaDesde()
+                )
             }
         }
     }
@@ -91,29 +92,30 @@ class FiltradoActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun obtenerFecha(
         button: Button,
         restriccionMaxDate: Boolean = false,
         restriccionMinDate: Boolean = false,
-        fechaMinima: Long? = null // Nueva parametro para la fecha minima
+        fechaMinima: Long? = null // Parametro para la fecha minima
     ) {
         val calendario = Calendar.getInstance()
         val anno = calendario.get(Calendar.YEAR)
         val mes = calendario.get(Calendar.MONTH)
         val dia = calendario.get(Calendar.DAY_OF_MONTH)
-
-        val datePickerDialog = DatePickerDialog(this,
+        val datePickerDialog = DatePickerDialog(
+            this,
             { _, year, month, dayOfMonth ->
                 button.text = "$dayOfMonth/${month + 1}/$year"
             }, anno, mes, dia
         )
 
         // Establezco las fechas mínimas y máximas
-        restriccionMinDate?.let {
+        restriccionMinDate.let {
             datePickerDialog.datePicker.minDate = fechaMinima ?: 0
         }
 
-        restriccionMaxDate?.let {
+        restriccionMaxDate.let {
             val calendarioMax = Calendar.getInstance()
             calendarioMax.add(Calendar.MONTH, 12) // Establece la fecha maxima en 12 meses
             datePickerDialog.datePicker.maxDate = calendarioMax.timeInMillis
@@ -123,12 +125,8 @@ class FiltradoActivity : AppCompatActivity() {
 
     private fun obtenerFechaDesde(): Long {
         val formato = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-
-        // Obtengo la fecha desde  donde almaceno la fecha seleccionada
         val fechaDesdeTexto = btnDesde.text.toString()
-
         try {
-            // Parseo la fecha y devuelvo el tiempo en milisegundos
             val fechaDesde = formato.parse(fechaDesdeTexto)
             return fechaDesde?.time ?: 0L
         } catch (e: Exception) {
@@ -138,16 +136,19 @@ class FiltradoActivity : AppCompatActivity() {
     }
 
     private fun inicializarPreferenciasCompartidas() {
-        preferenciasCompartidas = getSharedPreferences("preferencias_filtrado",
-            Context.MODE_PRIVATE)    }
+        preferenciasCompartidas = getSharedPreferences(
+            "preferencias_filtrado",
+            Context.MODE_PRIVATE
+        )
+    }
 
     private fun configurarSeekbar() {
         //Recibo el valor máximo de las facturas de la ventana anterior y lo redondeo
-        val valorMax = intent.getDoubleExtra("valorMax", 0.0).toInt() + 1
+        val valorMax = calcularValorMax()
 
         //Configuro la seekbar y los textos con sus valores min, max y actuales
         seekbarImporte = binding.seekbarImporte
-        seekbarImporte.max = valorMax   //Le indico el valor máximo para que no vaya hasta 100
+        seekbarImporte.max = valorMax //Le indico el valor máximo para que no vaya hasta 100
         tvMinImporte = binding.tvMinImporte
         tvMaxImporte = binding.tvMaxImporte
         tvImporteActual = binding.tvImporteActual
@@ -157,19 +158,20 @@ class FiltradoActivity : AppCompatActivity() {
         calcularValorActualSeekbar(valorMax)
     }
 
+    private fun calcularValorMax(): Int {
+        return intent.getDoubleExtra("valorMax", 0.0).toInt() + 1
+    }
+
     private fun configurarToolbar() {
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
-
-        // Modifico el título de la barra de herramientas (toolbar)
-        supportActionBar?.title = "Filtrar facturas"
+        supportActionBar?.title = "Filtrar facturas"// Cambio el título de la toolbar
     }
 
     private fun configurarBotonAplicarFiltros() {
         binding.btnAplicar.setOnClickListener {
-            val gson = Gson()
+            val gson = instanciarGson()
             val intent = Intent(this, MainActivity::class.java)
-
             val estadoCheckBox = hashMapOf(
                 PAGADAS to binding.checkboxPagada.isChecked,
                 ANULADAS to binding.checkboxAnuladas.isChecked,
@@ -177,26 +179,22 @@ class FiltradoActivity : AppCompatActivity() {
                 PENDIENTES_DE_PAGO to binding.checkboxPendientesDePago.isChecked,
                 PLAN_DE_PAGO to binding.checkboxPlanDePago.isChecked
             )
-
             val fechaDesde = binding.btnDesde.text.toString()
             val fechaHasta = binding.btnHasta.text.toString()
             val importe = binding.seekbarImporte.progress.toDouble()
-
             val filtro = Filtro(fechaHasta, fechaDesde, importe, estadoCheckBox)
             intent.putExtra("datosFiltrados", gson.toJson(filtro))
-
             cargarPreferenciasCompartidas()
             startActivity(intent)
         }
     }
 
+    private fun instanciarGson(): Gson { return Gson() }
+
     private fun configurarBotonEliminarFiltros() {
         binding.btnEliminarFiltros.setOnClickListener {
-            //Para restablecer los valores de texto de los botones con las fechas
             resetearFecha()
-            //Para restablecer el valor de la seekbar a 0
             resetearSeekbar()
-            //Para restablecer los valores de las checkboxes
             resetearCheckBoxes()
         }
     }
@@ -213,11 +211,7 @@ class FiltradoActivity : AppCompatActivity() {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Alerta")
         builder.setMessage("Por favor, selecciona primero la fecha Desde")
-
-        builder.setPositiveButton("Aceptar") { dialog, _ ->
-            dialog.dismiss()
-        }
-
+        builder.setPositiveButton("Aceptar") { dialog, _ -> dialog.dismiss() }
         val alertDialog = builder.create()
         alertDialog.show()
     }
@@ -228,18 +222,19 @@ class FiltradoActivity : AppCompatActivity() {
         btnHasta.text = getString(R.string.dia_mes_ano)
     }
 
-    private fun resetearSeekbar(){
-        val valorMax = intent.getDoubleExtra("valorMax", 0.0).toInt() + 1
+    private fun resetearSeekbar() {
+        val valorMax = calcularValorMax()
         seekbarImporte.progress = valorMax
     }
 
-    private fun resetearCheckBoxes(){
+    private fun resetearCheckBoxes() {
         checkboxPagada.isChecked = false
         checkboxAnuladas.isChecked = false
         checkboxCuotaFija.isChecked = false
         checkboxPendientesDePago.isChecked = false
         checkboxPlanDePago.isChecked = false
     }
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_cerrar, menu)
         return true
@@ -264,7 +259,7 @@ class FiltradoActivity : AppCompatActivity() {
 
         tvMaxImporte.text = "${maxImporte}€" //Escribo el valor maximo de la seekbar y le añado €
 
-        //Acciones a realizar en caso de mover la barra
+        //Acciones a realizar en caso de mover la barra (seekbar)
         seekbarImporte.setOnSeekBarChangeListener(object : OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
                 tvImporteActual.text = "${i}€"  //Escribo el valor actual de la seekbar y le añado €
@@ -285,7 +280,7 @@ class FiltradoActivity : AppCompatActivity() {
     // Métodos para las preferencias compartidas
     private fun guardarEstadoFiltro(filtro: Filtro) {
         val preferencias = getSharedPreferences("preferencias_filtrado", Context.MODE_PRIVATE)
-        val gson = Gson()
+        val gson = instanciarGson()
         val jsonFiltro = gson.toJson(filtro)
         preferencias.edit().putString("ESTADO_FILTRO", jsonFiltro).apply()
     }
@@ -293,19 +288,17 @@ class FiltradoActivity : AppCompatActivity() {
     private fun aplicarFiltrosGuardados() {
         val preferencias = getSharedPreferences("preferencias_filtrado", Context.MODE_PRIVATE)
         val jsonFiltro = preferencias.getString("ESTADO_FILTRO", null)
-
-        if (jsonFiltro != null) {
-            val gson = Gson()
-            val filtro = gson.fromJson(jsonFiltro, Filtro::class.java)
-            filtro?.let { filtroNoNulo ->
-                cargarFiltros(filtroNoNulo)
-            }
-        } else {
-            // No hay filtros previos almacenados, establecer valores predeterminados
-            val filtroPredeterminado = Filtro("fechaHasta", "fechaDesde",
-                0.0, hashMapOf())
-            cargarFiltros(filtroPredeterminado)
-        }
+        val gson = instanciarGson()
+        // Creo un filtro predeterminado en caso de que no haya ningún filtro almacenado
+        val filtroPredeterminado = Filtro(
+            "fechaHasta", "fechaDesde",
+            0.0, hashMapOf()
+        )
+        // Si jsonFiltro no es nulo se pasa a un objeto Filtro utilizando Gson
+        val filtro = jsonFiltro?.let {
+            gson.fromJson(it, Filtro::class.java)
+        } ?: filtroPredeterminado // Si jsonFiltro es nulo, se asigna el filtro predeterminado
+        cargarFiltros(filtro)
     }
 
     private fun cargarFiltros(filtro: Filtro) {

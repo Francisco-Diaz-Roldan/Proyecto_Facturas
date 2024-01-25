@@ -1,7 +1,7 @@
 package com.example.proyecto_facturas.constantes
 
 class Constantes {
-    companion object{
+    companion object {
         const val PAGADAS = "Pagadas"
         const val ANULADAS = "Anuladas"
         const val CUOTA_FIJA = "Cuota fija"

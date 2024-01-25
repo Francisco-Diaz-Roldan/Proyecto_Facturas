@@ -16,8 +16,12 @@
     <string name="fecha">Fecha</string>
     <string name="estado_de_pago">Estado de Pago</string>
     <string name="informacion">Información</string>
-    <string name="esta_funcionalidad_aun_no_esta_disponible">Esta funcionalidad aún no está disponible</string>
+    <string name="esta_funcionalidad_aun_no_esta_disponible">
+                  Esta funcionalidad aún no está disponible</string>
     <string name="cerrar">Cerrar</string>
     <string name="_0e">0€</string>
     <string name="no_hay_facturas_disponibles">No hay facturas disponibles</string>
+    <string name="valoractual">ValorActual</string>
+    <string name="valor_maximo">Valor Maximo</string>
+    <string name="valorminimo">ValorMinimo</string>
 </resources>

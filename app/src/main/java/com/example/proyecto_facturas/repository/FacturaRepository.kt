@@ -26,7 +26,7 @@ class FacturaRepository @Inject constructor(
     fun llamarApi() {
         val call: Call<FacturaRepositoriesListResponse> =
             retrofitServiceInterface.obtenerFacturasApi()
-        call?.enqueue(object : Callback<FacturaRepositoriesListResponse> {
+        call.enqueue(object : Callback<FacturaRepositoriesListResponse> {
             override fun onResponse(
                 call: Call<FacturaRepositoriesListResponse>,
                 response: Response<FacturaRepositoriesListResponse>
@@ -44,7 +44,6 @@ class FacturaRepository @Inject constructor(
                     }
                 }
             }
-
             override fun onFailure(call: Call<FacturaRepositoriesListResponse>, t: Throwable) {
                 Log.d("ERROR", "Ha ocurrido un error al establecer la conexión.")
             }

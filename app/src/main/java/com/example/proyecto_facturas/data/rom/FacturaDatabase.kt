@@ -10,7 +10,7 @@ abstract class FacturaDatabase : RoomDatabase() {
     abstract fun getAppDAO(): FacturaDAO
 
     companion object {
-        //Instancia de la Base de Datos.
+        //Instancia de la Base de Datos
         private var DB_INSTANCE: FacturaDatabase? = null
 
         fun getAppDBInstance(context: Context): FacturaDatabase {

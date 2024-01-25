@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var facturaAdapter: FacturaAdapter
     private var valorMax: Double = 0.0
-    private  var filtro: Filtro? = null
+    private var filtro: Filtro? = null
     private val preferenciasCompartidas: SharedPreferences by lazy {
         getSharedPreferences("preferencias_app", Context.MODE_PRIVATE)
     }
@@ -94,14 +94,12 @@ class MainActivity : AppCompatActivity() {
     private fun inicializarMainViewModel() {
         //Inicializa la vista(ViewModel) y las listas de facturas
         val viewModel = ViewModelProvider(this).get(FacturaViewModel::class.java)
-        viewModel.getAllRepositoryList().observe(this){
+        viewModel.getAllRepositoryList().observe(this) {
 
             facturaAdapter.setListaFacturas(it)
             //facturaAdapter.notifyDataSetChanged()
 
-            if (it.isEmpty()) {
-                viewModel.llamarApi()
-            }
+            if (it.isEmpty()) { viewModel.llamarApi() }
 
             //Para Filtrar los datos. Obtenemos los datos de la actividad FiltradoActivity
             val datosFiltrados = intent.getStringExtra("datosFiltrados")
@@ -116,6 +114,7 @@ class MainActivity : AppCompatActivity() {
                     filtrosAplicados.fechaHasta,
                     listaFactura
                 )
+
                 //Aplico los filtros de importe
                 listaFactura = comprobarImporteFiltrado(filtrosAplicados.importe, listaFactura)
 
@@ -156,9 +155,9 @@ class MainActivity : AppCompatActivity() {
 
         //En caso de que se haya modificado la fecha en la pantalla de fitrado
         if (fechaDesdeStr != getString(R.string.dia_mes_ano) && fechaHastaStr !=
-            getString(R.string.dia_mes_ano)) {
+            getString(R.string.dia_mes_ano)
+        ) {
             val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-
             val fechaDesde: Date? = sdf.parse(fechaDesdeStr)
             val fechaHasta: Date? = sdf.parse(fechaHastaStr)
 
@@ -177,8 +176,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun comprobarImporteFiltrado(//Para filtrar por importe
-        importe: Double,
-        listaFactura: List<Factura>
+        importe: Double, listaFactura: List<Factura>
     ): List<Factura> {
         // Creo una segunda lista para devolverla despues con los datos filtrados
         val listaFiltradaPorImporte = ArrayList<Factura>()
@@ -193,8 +191,7 @@ class MainActivity : AppCompatActivity() {
 
     //Para filtrar por las checkboxes (estado de pago)
     private fun comprobarEstadoPagoFiltrado(
-        estado: HashMap<String, Boolean>,
-        listaFactura: List<Factura>
+        estado: HashMap<String, Boolean>, listaFactura: List<Factura>
     ): List<Factura> {
         // Creo una segunda lista para devolverla despues con los datos filtrados
         val listaFiltradaPorEstado = ArrayList<Factura>()
@@ -254,7 +251,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.menu_filtros, menu)
-
         return true
     }
 
@@ -273,7 +269,6 @@ class MainActivity : AppCompatActivity() {
         builder.setNegativeButton("Cerrar") { dialog, which ->
             dialog.dismiss()
         }
-
         // Creo y enseño el diálogo
         val alertDialog: AlertDialog = builder.create()
         alertDialog.show()
@@ -284,14 +279,13 @@ class MainActivity : AppCompatActivity() {
             R.id.menuFiltrar -> {
                 val intent = Intent(this, FiltradoActivity::class.java)
                 intent.putExtra("valorMax", valorMax)
-                if (filtro !=null){
+                if (filtro != null) {
                     var gson = Gson()
                     intent.putExtra("datosFiltrados", gson.toJson(filtro))
                 }
                 startActivity(intent)
                 true
             }
-
             else -> super.onOptionsItemSelected(item)
         }
     }
@@ -304,8 +298,10 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun obtenerListaFiltradaDesdePreferencias(): List<Factura>? {
-        val listaFiltradaJson = preferenciasCompartidas.getString("lista_filtrada",
-            null)
+        val listaFiltradaJson = preferenciasCompartidas.getString(
+            "lista_filtrada",
+            null
+        )
         if (listaFiltradaJson != null) {
             val gson = Gson()
             val tipoLista = object : TypeToken<List<Factura>>() {}.type

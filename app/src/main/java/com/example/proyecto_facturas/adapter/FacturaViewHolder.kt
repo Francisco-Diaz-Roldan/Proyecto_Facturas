@@ -11,7 +11,7 @@ import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-class FacturaViewHolder(view: View) : RecyclerView.ViewHolder(view) { //TODO hacer con retrofit
+class FacturaViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     private val binding = ListaFacturasBinding.bind(view)
     private lateinit var factura: Factura
 

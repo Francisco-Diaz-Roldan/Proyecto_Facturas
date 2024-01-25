@@ -11,4 +11,3 @@ data class Factura(
     val importeOrdenacion: Double?,
     val fecha: String?
 )
-

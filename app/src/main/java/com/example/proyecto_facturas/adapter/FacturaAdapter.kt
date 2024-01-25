@@ -8,9 +8,9 @@ import com.example.proyecto_facturas.R
 import com.example.proyecto_facturas.data.rom.Factura
 
 class FacturaAdapter(
-    private var facturaLista: List<Factura>?=null,
-    private val onClickListener: (Factura) -> Unit) : RecyclerView.Adapter<FacturaViewHolder>() {
-    //TODO hacer el adapter y el retrofit
+    private var facturaLista: List<Factura>? = null,
+    private val onClickListener: (Factura) -> Unit
+) : RecyclerView.Adapter<FacturaViewHolder>() {
     @SuppressLint("SuspiciousIndentation")
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FacturaViewHolder {
         val layoutInflater = LayoutInflater.from(parent.context)
@@ -21,7 +21,6 @@ class FacturaAdapter(
                 false
             )
         )
-
     }
 
     override fun getItemCount(): Int {
@@ -34,7 +33,7 @@ class FacturaAdapter(
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun setListaFacturas(factura: List<Factura>?){
+    fun setListaFacturas(factura: List<Factura>?) {
         this.facturaLista = factura
         notifyDataSetChanged()
     }

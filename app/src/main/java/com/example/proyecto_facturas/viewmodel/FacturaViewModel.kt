@@ -7,7 +7,7 @@ import com.example.proyecto_facturas.data.rom.Factura
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
-//Inyección de dependencias. Indica que la clase FacturaViewModel debe ser gestionada por Hilt.
+//Inyección de dependencias, indica que la clase FacturaViewModel debe ser gestionada por Hilt
 @HiltViewModel
 class FacturaViewModel @Inject constructor(private val facturaRepository: FacturaRepository) :
     ViewModel() {
