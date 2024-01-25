@@ -53,25 +53,11 @@ class FiltradoActivity : AppCompatActivity() {
         binding = ActivityFiltradoBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Inicializo las preferencias compartidas
-        preferenciasCompartidas = getSharedPreferences("preferencias_filtrado",
-            Context.MODE_PRIVATE)
+        inicializarPreferenciasCompartidas()
 
-        //Para el botón desde
-        btnDesde = binding.btnDesde
-        btnDesde.setOnClickListener {
-            obtenerFecha(btnDesde, restriccionMinDate = true)
-        }
+        configurarBotonDesde()
 
-        //Para el botón hasta ( fecha mínima)
-        btnHasta = binding.btnHasta
-        btnHasta.setOnClickListener {
-            if (btnDesde.text.toString() == getString(R.string.dia_mes_ano)) {
-                mostrarAlertDialog()
-            } else {
-                obtenerFecha(btnHasta, restriccionMinDate = true, fechaMinima = obtenerFechaDesde())
-            }
-        }
+        configurarBotonHasta()
 
         configurarSeekbar()
 
@@ -85,6 +71,75 @@ class FiltradoActivity : AppCompatActivity() {
 
         aplicarFiltrosGuardados()
     }
+
+    private fun configurarBotonHasta() {
+        btnHasta = binding.btnHasta
+        btnHasta.setOnClickListener {
+            if (btnDesde.text.toString() == getString(R.string.dia_mes_ano)) {
+                mostrarAlertDialog()
+            } else {
+                obtenerFecha(btnHasta, restriccionMinDate = true, restriccionMaxDate = true,
+                    fechaMinima = obtenerFechaDesde())
+            }
+        }
+    }
+
+    private fun configurarBotonDesde() {
+        btnDesde = binding.btnDesde
+        btnDesde.setOnClickListener {
+            obtenerFecha(btnDesde, restriccionMinDate = true)
+        }
+    }
+
+    private fun obtenerFecha(
+        button: Button,
+        restriccionMaxDate: Boolean = false,
+        restriccionMinDate: Boolean = false,
+        fechaMinima: Long? = null // Nueva parametro para la fecha minima
+    ) {
+        val calendario = Calendar.getInstance()
+        val anno = calendario.get(Calendar.YEAR)
+        val mes = calendario.get(Calendar.MONTH)
+        val dia = calendario.get(Calendar.DAY_OF_MONTH)
+
+        val datePickerDialog = DatePickerDialog(this,
+            { _, year, month, dayOfMonth ->
+                button.text = "$dayOfMonth/${month + 1}/$year"
+            }, anno, mes, dia
+        )
+
+        // Establezco las fechas mínimas y máximas
+        restriccionMinDate?.let {
+            datePickerDialog.datePicker.minDate = fechaMinima ?: 0
+        }
+
+        restriccionMaxDate?.let {
+            val calendarioMax = Calendar.getInstance()
+            calendarioMax.add(Calendar.MONTH, 12) // Establece la fecha maxima en 12 meses
+            datePickerDialog.datePicker.maxDate = calendarioMax.timeInMillis
+        }
+        datePickerDialog.show()
+    }
+
+    private fun obtenerFechaDesde(): Long {
+        val formato = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+
+        // Obtengo la fecha desde  donde almaceno la fecha seleccionada
+        val fechaDesdeTexto = btnDesde.text.toString()
+
+        try {
+            // Parseo la fecha y devuelvo el tiempo en milisegundos
+            val fechaDesde = formato.parse(fechaDesdeTexto)
+            return fechaDesde?.time ?: 0L
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        return 0L // En caso de error devuelve el valor predeterminado
+    }
+
+    private fun inicializarPreferenciasCompartidas() {
+        preferenciasCompartidas = getSharedPreferences("preferencias_filtrado",
+            Context.MODE_PRIVATE)    }
 
     private fun configurarSeekbar() {
         //Recibo el valor máximo de las facturas de la ventana anterior y lo redondeo
@@ -198,50 +253,6 @@ class FiltradoActivity : AppCompatActivity() {
             }
             else -> return super.onOptionsItemSelected(item)
         }
-    }
-
-    private fun obtenerFecha(
-        button: Button,
-        restriccionMaxDate: Boolean = false,
-        restriccionMinDate: Boolean = false,
-        fechaMinima: Long? = null // Nueva parametro para la fecha minima
-    ) {
-        val calendario = Calendar.getInstance()
-        val anno = calendario.get(Calendar.YEAR)
-        val mes = calendario.get(Calendar.MONTH)
-        val dia = calendario.get(Calendar.DAY_OF_MONTH)
-
-        val datePickerDialog = DatePickerDialog(this,
-            { _, year, month, dayOfMonth ->
-                button.text = "$dayOfMonth/${month + 1}/$year"
-            }, anno, mes, dia
-        )
-
-        // Establezco las fechas mínimas y máximas
-        restriccionMinDate?.let {
-            datePickerDialog.datePicker.minDate = fechaMinima ?: 0
-        }
-
-        restriccionMaxDate?.let {
-            datePickerDialog.datePicker.maxDate = Date().time
-        }
-        datePickerDialog.show()
-    }
-
-    private fun obtenerFechaDesde(): Long {
-        val formato = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-
-        // Obtengo la fecha desde  donde almaceno la fecha seleccionada
-        val fechaDesdeTexto = btnDesde.text.toString()
-
-        try {
-            // Parseo la fecha y devuelvo el tiempo en milisegundos
-            val fechaDesde = formato.parse(fechaDesdeTexto)
-            return fechaDesde?.time ?: 0L
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-        return 0L // En caso de error devuelve el valor predeterminado
     }
 
     @SuppressLint("SetTextI18n")
