@@ -78,7 +78,7 @@ class FiltradoActivity : AppCompatActivity() {
                 mostrarAlertDialog()
             } else {
                 obtenerFecha(
-                    btnHasta, restriccionMinDate = true, restriccionMaxDate = true,
+                    btnHasta, restriccionFechaMin = true, restriccionFechaMax = true,
                     fechaMinima = obtenerFechaDesde()
                 )
             }
@@ -88,15 +88,15 @@ class FiltradoActivity : AppCompatActivity() {
     private fun configurarBotonDesde() {
         btnDesde = binding.btnDesde
         btnDesde.setOnClickListener {
-            obtenerFecha(btnDesde, restriccionMinDate = true)
+            obtenerFecha(btnDesde, restriccionFechaMin = true)
         }
     }
 
     @SuppressLint("SetTextI18n")
     private fun obtenerFecha(
         button: Button,
-        restriccionMaxDate: Boolean = false,
-        restriccionMinDate: Boolean = false,
+        restriccionFechaMax: Boolean = false,
+        restriccionFechaMin: Boolean = false,
         fechaMinima: Long? = null // Parametro para la fecha minima
     ) {
         val calendario = Calendar.getInstance()
@@ -111,11 +111,11 @@ class FiltradoActivity : AppCompatActivity() {
         )
 
         // Establezco las fechas mínimas y máximas
-        restriccionMinDate.let {
+        restriccionFechaMin.let {
             datePickerDialog.datePicker.minDate = fechaMinima ?: 0
         }
 
-        restriccionMaxDate.let {
+        restriccionFechaMax.let {
             val calendarioMax = Calendar.getInstance()
             calendarioMax.add(Calendar.MONTH, 12) // Establece la fecha maxima en 12 meses
             datePickerDialog.datePicker.maxDate = calendarioMax.timeInMillis
