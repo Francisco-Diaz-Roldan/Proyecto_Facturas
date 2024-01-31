@@ -117,7 +117,7 @@ class FiltradoActivity : AppCompatActivity() {
 
         restriccionFechaMax.let {
             val calendarioMax = Calendar.getInstance()
-            calendarioMax.add(Calendar.MONTH, 12) // Establece la fecha maxima en 12 meses
+            calendarioMax.add(Calendar.YEAR, 100) // Establece la fecha maxima en 100 años
             datePickerDialog.datePicker.maxDate = calendarioMax.timeInMillis
         }
         datePickerDialog.show()
