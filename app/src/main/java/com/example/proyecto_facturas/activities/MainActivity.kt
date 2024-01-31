@@ -261,7 +261,7 @@ class MainActivity : AppCompatActivity() {
         val builder = AlertDialog.Builder(this)
 
         // Configuro el diálogo
-        builder.setTitle("Informción")
+        builder.setTitle("Información")
         builder.setMessage("Esta funcionalidad aún no está disponible")
 
         // Botón negativo Cerrar
