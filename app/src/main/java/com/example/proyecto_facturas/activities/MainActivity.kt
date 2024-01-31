@@ -85,7 +85,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun inicializarAdapter() {
-        facturaAdapter = FacturaAdapter() { factura ->
+        facturaAdapter = FacturaAdapter { factura ->
             onItemSelected(factura)
         }
     }
@@ -104,7 +104,7 @@ class MainActivity : AppCompatActivity() {
             //Para Filtrar los datos. Obtenemos los datos de la actividad FiltradoActivity
             val datosFiltrados = intent.getStringExtra("datosFiltrados")
             if (datosFiltrados != null) {
-                // Convierte strings JSON (datosFiltrados) en objeto  de tipo Filtro utilizando Gson
+                // Convierte strings JSON (datosFiltrados) en objeto de tipo Filtro utilizando Gson
                 val filtrosAplicados = Gson().fromJson(datosFiltrados, Filtro::class.java)
                 var listaFactura = it
 
@@ -161,7 +161,7 @@ class MainActivity : AppCompatActivity() {
             val fechaDesde: Date? = sdf.parse(fechaDesdeStr)
             val fechaHasta: Date? = sdf.parse(fechaHastaStr)
 
-            //Añado a la lista lista filtrada las fechas comprendidas entre desde y hasta
+            //Añado a la lista listaFiltrada las fechas comprendidas entre desde y hasta
             for (factura in listaFacturas) {
                 val fecha = sdf.parse(factura.fecha)!!
                 if (fecha.after(fechaDesde) && fecha.before(fechaHasta)) {
@@ -205,8 +205,7 @@ class MainActivity : AppCompatActivity() {
 
         //En caso de no haber seleccionado ninguna checkbox
         if (!chBoxPagadas && !chBoxAnuladas && !chBoxCuotaFija && !chBoxPendientesPago
-            && !chBoxPlanPago
-        ) {
+            && !chBoxPlanPago) {
             return listaFactura
         }
         // Comprobamos el estado de cada checkbox con respecto al JSON, no con respecto a
