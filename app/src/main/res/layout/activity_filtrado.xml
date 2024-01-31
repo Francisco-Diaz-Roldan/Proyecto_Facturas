@@ -225,29 +225,47 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/checkboxPendientesDePago" />
 
-    <Button
-        android:id="@+id/btnAplicar"
-        android:layout_width="250dp"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:backgroundTint="@color/green"
-        android:text="@string/aplicar"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/checkboxPlanDePago"
-        tools:ignore="MissingConstraints" />
+        android:orientation="horizontal"
+        android:weightSum="2"
 
-    <Button
-        android:id="@+id/btnEliminarFiltros"
-        android:layout_width="250dp"
-        android:layout_height="wrap_content"
-        android:backgroundTint="@color/white"
-        android:elevation="8dp"
-        android:text="@string/eliminar_filtros"
-        android:textColor="@color/green"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnAplicar" />
+        app:layout_constraintTop_toBottomOf="@+id/checkboxPlanDePago"
+        tools:ignore="MissingConstraints">
+
+        <Button
+            android:id="@+id/btnAplicar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="5dp"
+            android:layout_marginEnd="2.5dp"
+            android:backgroundTint="@color/green"
+            android:text="@string/aplicar"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/checkboxPlanDePago"
+            app:layout_constraintVertical_bias="0.257"
+            tools:ignore="MissingConstraints" />
+
+        <Button
+            android:id="@+id/btnEliminarFiltros"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="2.5dp"
+            android:layout_marginEnd="5dp"
+            android:backgroundTint="@color/white"
+            android:elevation="8dp"
+            android:text="@string/eliminar_filtros"
+            android:textColor="@color/green"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/btnAplicar" />
+
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
