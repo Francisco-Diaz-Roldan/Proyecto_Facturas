@@ -55,4 +55,3 @@ class FacturaViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         }
     }
 }
-

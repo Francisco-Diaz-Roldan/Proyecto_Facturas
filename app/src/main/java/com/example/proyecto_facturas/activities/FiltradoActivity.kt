@@ -154,7 +154,6 @@ class FiltradoActivity : AppCompatActivity() {
         tvImporteActual = binding.tvImporteActual
         tvMinImporte.text = getString(R.string._0e)
         tvImporteActual.text = getString(R.string._0e)
-
         calcularValorActualSeekbar(valorMax)
     }
 
@@ -186,6 +185,7 @@ class FiltradoActivity : AppCompatActivity() {
             intent.putExtra("datosFiltrados", gson.toJson(filtro))
             cargarPreferenciasCompartidas()
             startActivity(intent)
+            finish()
         }
     }
 
@@ -193,10 +193,14 @@ class FiltradoActivity : AppCompatActivity() {
 
     private fun configurarBotonEliminarFiltros() {
         binding.btnEliminarFiltros.setOnClickListener {
-            resetearFecha()
-            resetearSeekbar()
-            resetearCheckBoxes()
+           resetearParametros()
         }
+    }
+
+    private fun resetearParametros() {
+        resetearFecha()
+        resetearSeekbar()
+        resetearCheckBoxes()
     }
 
     private fun configurarCheckBoxes() {
@@ -299,6 +303,9 @@ class FiltradoActivity : AppCompatActivity() {
             gson.fromJson(it, Filtro::class.java)
         } ?: filtroPredeterminado // Si jsonFiltro es nulo, se asigna el filtro predeterminado
         cargarFiltros(filtro)
+
+        // Actualizo la SeekBar con el valor guardado
+        seekbarImporte.progress = filtro.importe.toInt()
     }
 
     private fun cargarFiltros(filtro: Filtro) {

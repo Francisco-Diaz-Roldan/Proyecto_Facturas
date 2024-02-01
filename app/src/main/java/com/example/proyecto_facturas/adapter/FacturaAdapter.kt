@@ -37,4 +37,8 @@ class FacturaAdapter(
         this.facturaLista = factura
         notifyDataSetChanged()
     }
+
+    fun getListaFacturas(): List<Factura>? {
+        return facturaLista
+    }
 }
