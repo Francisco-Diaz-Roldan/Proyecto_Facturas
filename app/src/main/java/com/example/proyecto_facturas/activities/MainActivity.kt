@@ -102,54 +102,54 @@ class MainActivity : AppCompatActivity() {
 
             facturaAdapter.setListaFacturas(listaFactura)
 
-            // Si la lista completa está vacía, llamar a la API para obtener datos
+            // Si la lista completa está vacía, llamo a la API para obtener datos
             if (listaCompleta.isEmpty()) {
                 viewModel.llamarApi()
             }
 
-            // Para Filtrar los datos. Obtenemos los datos de la actividad FiltradoActivity
+            // Para Filtrar los datos. Se obtienen los datos de la actividad FiltradoActivity
             val datosFiltrados = intent.getStringExtra("datosFiltrados")
             if (datosFiltrados != null) {
-                // Convierte strings JSON (datosFiltrados) en objeto de tipo Filtro utilizando Gson
+                // Convierto strings JSON (datosFiltrados) en objeto de tipo Filtro utilizando Gson
                 val filtrosAplicados = Gson().fromJson(datosFiltrados, Filtro::class.java)
 
-                // Aplicar los filtros de fecha
+                // Aplico los filtros de fecha
                 var listaFiltrada = comprobarFechaFiltrado(
                     filtrosAplicados.fechaDesde,
                     filtrosAplicados.fechaHasta,
-                    listaCompleta // Usar la lista completa aquí
+                    listaCompleta // Uso la lista completa aquí
                 )
 
-                // Aplicar los filtros de importe
+                // Aplico los filtros de importe
                 listaFiltrada = comprobarImporteFiltrado(filtrosAplicados.importe, listaFiltrada)
 
-                // Aplicar los filtros de estado de las checkBoxes
+                // Aplico los filtros de estado de las checkBoxes
                 listaFiltrada = comprobarEstadoPagoFiltrado(filtrosAplicados.estado, listaFiltrada)
 
-                // Guardar la lista filtrada en preferencias
+                // Guardo la lista filtrada en preferencias
                 guardarListaFiltradaEnPreferencias(listaFiltrada)
 
-                // Mostrar un texto en caso de que la lista esté vacía
+                // Muestro un texto en caso de que la lista esté vacía
                 val tvSinFacturas = binding.tvSinFacturas
                 tvSinFacturas.visibility = if (listaFiltrada.isEmpty()) View.VISIBLE else View.GONE
 
                 // Muestro por pantalla la lista filtrada
                 facturaAdapter.setListaFacturas(listaFiltrada)
 
-                // Actualizar el valor máximo solo con la lista completa
+                // Actualizo el valor máximo solo con la lista completa
                 valorMax = calcularMaximo(listaCompleta)
             }
 
-            // Si hay preferencias compartidas y no hay datos filtrados, cargar la lista filtrada guardada
+            // Si hay preferencias compartidas y no hay datos filtrados, cargo la lista filtrada
             if (listaFiltradaGuardada != null && datosFiltrados == null) {
-                // Mostrar un texto en caso de que la lista esté vacía
                 val tvSinFacturas = binding.tvSinFacturas
-                tvSinFacturas.visibility = if (listaFiltradaGuardada.isEmpty()) View.VISIBLE else View.GONE
+                tvSinFacturas.visibility = if (listaFiltradaGuardada.isEmpty())
+                    View.VISIBLE else View.GONE
 
                 // Muestro por pantalla la lista filtrada guardada
                 facturaAdapter.setListaFacturas(listaFiltradaGuardada)
 
-                // Actualizar el valor máximo solo con la lista completa
+                // Actualizo el valor máximo solo con la lista completa
                 valorMax = calcularMaximo(listaCompleta)
             }
         }
@@ -229,7 +229,7 @@ class MainActivity : AppCompatActivity() {
         ) {
             return listaFactura
         }
-        // Comprobamos el estado de cada checkbox con respecto al JSON, no con respecto a
+        // Compruebo el estado de cada checkbox con respecto al JSON, no con respecto a
         // Strings/Constantes
         for (factura in listaFactura) {
             val estadoFactura = factura.descEstado
@@ -239,13 +239,10 @@ class MainActivity : AppCompatActivity() {
             val estaPendientePago = estadoFactura == "Pendiente de pago"
             val estaPlanPago = estadoFactura == "Plan de Pago"
 
-            // Comprobamos si el estado de la factura coincide con alguna checkbox seleccionada
+            // Compruebo si el estado de la factura coincide con alguna checkbox seleccionada
             if ((estaPagada && chBoxPagadas) || (estaAnulada && chBoxAnuladas) ||
                 (estaCuotaFija && chBoxCuotaFija) || (estaPendientePago && chBoxPendientesPago) ||
-                (estaPlanPago && chBoxPlanPago)
-            ) { //Si coincide, la añadimos a la lista filtrada por importe
-                listaFiltradaPorEstado.add(factura)
-            }
+                (estaPlanPago && chBoxPlanPago)) { listaFiltradaPorEstado.add(factura) }
         }
         return listaFiltradaPorEstado
     }
@@ -286,9 +283,7 @@ class MainActivity : AppCompatActivity() {
         builder.setMessage("Esta funcionalidad aún no está disponible")
 
         // Botón negativo Cerrar
-        builder.setNegativeButton("Cerrar") { dialog, which ->
-            dialog.dismiss()
-        }
+        builder.setNegativeButton("Cerrar") { dialog, which -> dialog.dismiss() }
         // Creo y enseño el diálogo
         val alertDialog: AlertDialog = builder.create()
         alertDialog.show()
@@ -300,7 +295,7 @@ class MainActivity : AppCompatActivity() {
                 val intent = Intent(this, FiltradoActivity::class.java)
                 intent.putExtra("valorMax", valorMax)
                 if (filtro != null) {
-                    var gson = Gson()
+                    val gson = Gson()
                     intent.putExtra("datosFiltrados", gson.toJson(filtro))
                 }
                 startActivity(intent)
@@ -331,11 +326,10 @@ class MainActivity : AppCompatActivity() {
         return null
     }
 
-    override fun onBackPressed() {
+    @Deprecated("Deprecated in Java")
+    override fun onBackPressed() {// Al darle a atrás en MainActivity, cierra la aplicación
         super.onBackPressed()
         facturaAdapter.getListaFacturas()?.let { guardarListaFiltradaEnPreferencias(it) }
-
-        // Al darle a atrás en MainActivity, cierra la aplicación
         finishAffinity()
     }
 }
