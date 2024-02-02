@@ -217,15 +217,6 @@ class FiltradoActivity : AppCompatActivity() {
         checkboxPlanDePago = binding.checkboxPlanDePago
     }
 
-    private fun mostrarAlertDialog() {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle("Alerta")
-        builder.setMessage("Por favor, selecciona primero la fecha Desde")
-        builder.setPositiveButton("Aceptar") { dialog, _ -> dialog.dismiss() }
-        val alertDialog = builder.create()
-        alertDialog.show()
-    }
-
 
     private fun resetearFecha() {
         btnDesde.text = getString(R.string.dia_mes_ano)
