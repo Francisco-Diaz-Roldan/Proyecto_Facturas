@@ -45,7 +45,8 @@ class FiltradoActivity : AppCompatActivity() {
     private lateinit var checkboxPendientesDePago: CheckBox
     private lateinit var checkboxPlanDePago: CheckBox
     private lateinit var preferenciasCompartidas: SharedPreferences
-
+    private var fechaDesdeSeleccionada = false
+    private var fechaHastaSeleccionada = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,24 +72,24 @@ class FiltradoActivity : AppCompatActivity() {
         aplicarFiltrosGuardados()
     }
 
-    private fun configurarBotonHasta() {
-        btnHasta = binding.btnHasta
-        btnHasta.setOnClickListener {
-            if (btnDesde.text.toString() == getString(R.string.dia_mes_ano)) {
-                mostrarAlertDialog()
-            } else {
-                obtenerFecha(
-                    btnHasta, restriccionFechaMin = true, restriccionFechaMax = true,
-                    fechaMinima = obtenerFechaDesde()
-                )
-            }
-        }
-    }
-
     private fun configurarBotonDesde() {
         btnDesde = binding.btnDesde
         btnDesde.setOnClickListener {
-            obtenerFecha(btnDesde, restriccionFechaMin = true)
+            fechaDesdeSeleccionada = true
+            obtenerFecha(btnDesde, restriccionFechaMin = false)
+        }
+    }
+
+    private fun configurarBotonHasta() {
+        btnHasta = binding.btnHasta
+        btnHasta.setOnClickListener {
+            fechaHastaSeleccionada = true
+            obtenerFecha(
+                btnHasta,
+                restriccionFechaMin = true,
+                restriccionFechaMax = true,
+                fechaMinima = obtenerFechaDesde()
+            )
         }
     }
 
@@ -178,10 +179,15 @@ class FiltradoActivity : AppCompatActivity() {
                 PENDIENTES_DE_PAGO to binding.checkboxPendientesDePago.isChecked,
                 PLAN_DE_PAGO to binding.checkboxPlanDePago.isChecked
             )
+
             val fechaDesde = binding.btnDesde.text.toString()
             val fechaHasta = binding.btnHasta.text.toString()
+
+            val fechaDesdeReal = if (fechaDesdeSeleccionada && fechaHastaSeleccionada) fechaDesde else "01/01/1900"
+            val fechaHastaReal = if (fechaDesdeSeleccionada && fechaHastaSeleccionada) fechaHasta else "31/12/9999"
+
             val importe = binding.seekbarImporte.progress.toDouble()
-            val filtro = Filtro(fechaHasta, fechaDesde, importe, estadoCheckBox)
+            val filtro = Filtro(fechaHastaReal, fechaDesdeReal, importe, estadoCheckBox)
             intent.putExtra("datosFiltrados", gson.toJson(filtro))
             cargarPreferenciasCompartidas()
             startActivity(intent)
@@ -224,6 +230,8 @@ class FiltradoActivity : AppCompatActivity() {
     private fun resetearFecha() {
         btnDesde.text = getString(R.string.dia_mes_ano)
         btnHasta.text = getString(R.string.dia_mes_ano)
+        fechaDesdeSeleccionada = false
+        fechaHastaSeleccionada = false
     }
 
     private fun resetearSeekbar() {
