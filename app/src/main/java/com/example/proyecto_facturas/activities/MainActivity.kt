@@ -10,6 +10,9 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -41,6 +44,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var facturaAdapter: FacturaAdapter
     private var valorMax: Double = 0.0
     private var filtro: Filtro? = null
+    private lateinit var intentLaunchActivityResult: ActivityResultLauncher<Intent>
     private val preferenciasCompartidas: SharedPreferences by lazy {
         getSharedPreferences("preferencias_app", Context.MODE_PRIVATE)
     }
@@ -61,6 +65,23 @@ class MainActivity : AppCompatActivity() {
         configurarFacturaAdapter()
 
         configurarToolbar()
+
+        inicializarintentLaunchActivityResult()
+    }
+
+    private fun inicializarintentLaunchActivityResult() {
+        intentLaunchActivityResult =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult())
+            { result: ActivityResult ->
+                if (result.resultCode == RESULT_OK) {
+                    val maxImporte = result.data?.extras?.getDouble("valorMax") ?: 0.0
+                    val filtroJson = result.data?.extras?.getString("datosFiltrados")
+                    if (filtroJson != null) {
+                        val gson = Gson()
+                        val objetoFiltrado = gson.fromJson(filtroJson, FiltradoActivity::class.java)
+                    }
+                }
+            }
     }
 
     private fun configurarFacturaAdapter() {
@@ -298,7 +319,7 @@ class MainActivity : AppCompatActivity() {
                     val gson = Gson()
                     intent.putExtra("datosFiltrados", gson.toJson(filtro))
                 }
-                startActivity(intent)
+                intentLaunchActivityResult.launch(intent)
                 true
             }
 
@@ -326,10 +347,11 @@ class MainActivity : AppCompatActivity() {
         return null
     }
 
+    /*
     @Deprecated("Deprecated in Java")
     override fun onBackPressed() {// Al darle a atrás en MainActivity, cierra la aplicación
         super.onBackPressed()
         facturaAdapter.getListaFacturas()?.let { guardarListaFiltradaEnPreferencias(it) }
         finishAffinity()
-    }
+    }*/
 }

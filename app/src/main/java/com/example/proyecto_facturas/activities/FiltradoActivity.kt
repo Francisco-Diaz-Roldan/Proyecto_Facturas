@@ -16,7 +16,9 @@ import android.widget.CheckBox
 import android.widget.SeekBar
 import android.widget.SeekBar.OnSeekBarChangeListener
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.example.proyecto_facturas.Filtro
@@ -45,6 +47,8 @@ class FiltradoActivity : AppCompatActivity() {
     private lateinit var checkboxPendientesDePago: CheckBox
     private lateinit var checkboxPlanDePago: CheckBox
     private lateinit var preferenciasCompartidas: SharedPreferences
+    private lateinit var intentLaunchActivityResult: ActivityResultLauncher<Intent>
+
     private var fechaDesdeSeleccionada = false
     private var fechaHastaSeleccionada = false
 
@@ -70,6 +74,23 @@ class FiltradoActivity : AppCompatActivity() {
         configurarToolbar()
 
         aplicarFiltrosGuardados()
+
+        inicializarintentLaunchActivityResult()
+    }
+
+    private fun inicializarintentLaunchActivityResult() {
+        intentLaunchActivityResult =
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                    result: ActivityResult ->
+                if (result.resultCode == RESULT_OK) {
+                    val maxImporte = result.data?.extras?.getDouble("valorMax") ?: 0.0
+                    val filtroJson = result.data?.extras?.getString("datosFiltrados")
+                    if (filtroJson != null) {
+                        val gson = Gson()
+                        val objFiltro = gson.fromJson(filtroJson, MainActivity::class.java)
+                    }
+                }
+            }
     }
 
     private fun configurarBotonDesde() {
@@ -190,7 +211,7 @@ class FiltradoActivity : AppCompatActivity() {
             val filtro = Filtro(fechaHastaReal, fechaDesdeReal, importe, estadoCheckBox)
             intent.putExtra("datosFiltrados", gson.toJson(filtro))
             cargarPreferenciasCompartidas()
-            startActivity(intent)
+            intentLaunchActivityResult.launch(intent)
             finish()
         }
     }
