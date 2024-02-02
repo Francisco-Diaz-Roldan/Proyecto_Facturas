@@ -7,5 +7,7 @@ class Constantes {
         const val CUOTA_FIJA = "Cuota fija"
         const val PENDIENTES_DE_PAGO = "Pendiente de pago"
         const val PLAN_DE_PAGO = "Plan de pago"
+        const val VALOR_MAX = "valorMax"
+        const val DATOS_FILTRADOS = "datosFiltrados"
     }
 }

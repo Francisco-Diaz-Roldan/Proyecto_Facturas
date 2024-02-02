@@ -4,8 +4,14 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Color
+import android.graphics.Typeface
 import android.icu.text.SimpleDateFormat
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.AbsoluteSizeSpan
+import android.text.style.StyleSpan
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -22,11 +28,13 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.proyecto_facturas.Filtro
 import com.example.proyecto_facturas.R
 import com.example.proyecto_facturas.adapter.FacturaAdapter
+import com.example.proyecto_facturas.constantes.Constantes
 import com.example.proyecto_facturas.constantes.Constantes.Companion.ANULADAS
 import com.example.proyecto_facturas.constantes.Constantes.Companion.CUOTA_FIJA
 import com.example.proyecto_facturas.constantes.Constantes.Companion.PAGADAS
 import com.example.proyecto_facturas.constantes.Constantes.Companion.PENDIENTES_DE_PAGO
 import com.example.proyecto_facturas.constantes.Constantes.Companion.PLAN_DE_PAGO
+import com.example.proyecto_facturas.constantes.Constantes.Companion.VALOR_MAX
 import com.example.proyecto_facturas.data.rom.Factura
 import com.example.proyecto_facturas.databinding.ActivityMainBinding
 import com.example.proyecto_facturas.viewmodel.FacturaViewModel
@@ -74,7 +82,7 @@ class MainActivity : AppCompatActivity() {
             registerForActivityResult(ActivityResultContracts.StartActivityForResult())
             { result: ActivityResult ->
                 if (result.resultCode == RESULT_OK) {
-                    val maxImporte = result.data?.extras?.getDouble("valorMax") ?: 0.0
+                    val maxImporte = result.data?.extras?.getDouble(Constantes.VALOR_MAX) ?: 0.0// De no ser una constante tendría que ir entre comillado
                     val filtroJson = result.data?.extras?.getString("datosFiltrados")
                     if (filtroJson != null) {
                         val gson = Gson()
@@ -269,14 +277,35 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun configurarToolbar() {
-        // Configuro la toolbar genérica
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        // Modifico el título de la barra de herramientas (toolbar)
-        supportActionBar?.title = "Facturas"
-    }
+        // Cambio el color de la barra de herramientas a blanco
+        toolbar.setBackgroundColor(Color.parseColor("#FFFFFFFF"))
 
+        // Creo un SpannableString para aplicar estilos al título
+        val spannableString = SpannableString("Facturas")
+
+        // Aplico el estilo bold al texto
+        spannableString.setSpan(
+            StyleSpan(Typeface.BOLD),
+            0, // Inicio del texto
+            spannableString.length, // Fin del texto
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+
+        // Establezco el tamaño de texto en píxeles
+        val tamanoTextoEnPixeles = resources.getDimensionPixelSize(R.dimen.tamano_texto_toolbar)
+        spannableString.setSpan(
+            AbsoluteSizeSpan(tamanoTextoEnPixeles),
+            0,
+            spannableString.length,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+
+        // Establezco el título de la barra de herramientas con el SpannableString
+        supportActionBar?.title = spannableString
+    }
 
     private fun calcularMaximo(listaFactura: List<Factura>): Double {
         var importeMaximo = 0.0

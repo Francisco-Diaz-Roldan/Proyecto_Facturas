@@ -5,9 +5,15 @@ import android.app.DatePickerDialog
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.graphics.Color
+import android.graphics.Typeface
 import android.icu.text.SimpleDateFormat
 import android.icu.util.Calendar
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.AbsoluteSizeSpan
+import android.text.style.StyleSpan
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
@@ -23,6 +29,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import com.example.proyecto_facturas.Filtro
 import com.example.proyecto_facturas.R
+import com.example.proyecto_facturas.constantes.Constantes
 import com.example.proyecto_facturas.constantes.Constantes.Companion.ANULADAS
 import com.example.proyecto_facturas.constantes.Constantes.Companion.CUOTA_FIJA
 import com.example.proyecto_facturas.constantes.Constantes.Companion.PAGADAS
@@ -83,8 +90,8 @@ class FiltradoActivity : AppCompatActivity() {
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
                     result: ActivityResult ->
                 if (result.resultCode == RESULT_OK) {
-                    val maxImporte = result.data?.extras?.getDouble("valorMax") ?: 0.0
-                    val filtroJson = result.data?.extras?.getString("datosFiltrados")
+                    val maxImporte = result.data?.extras?.getDouble(Constantes.VALOR_MAX) ?: 0.0
+                    val filtroJson = result.data?.extras?.getString(Constantes.DATOS_FILTRADOS)
                     if (filtroJson != null) {
                         val gson = Gson()
                         val objFiltro = gson.fromJson(filtroJson, MainActivity::class.java)
@@ -180,13 +187,38 @@ class FiltradoActivity : AppCompatActivity() {
     }
 
     private fun calcularValorMax(): Int {
-        return intent.getDoubleExtra("valorMax", 0.0).toInt() + 1
+        return intent.getDoubleExtra(Constantes.VALOR_MAX, 0.0).toInt() + 1
     }
 
     private fun configurarToolbar() {
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
-        supportActionBar?.title = "Filtrar facturas"// Cambio el título de la toolbar
+
+        // Cambio el color de la barra de herramientas a blanco
+        toolbar.setBackgroundColor(Color.parseColor("#FFFFFFFF"))
+
+        // Creo un SpannableString para aplicar estilos al título
+        val spannableString = SpannableString("Filtrar facturas")
+
+        // Aplico el estilo bold al texto
+        spannableString.setSpan(
+            StyleSpan(Typeface.BOLD),
+            0, // Inicio del texto
+            spannableString.length, // Fin del texto
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+
+        // Establezco el tamaño de texto en píxeles
+        val tamanoTextoEnPixeles = resources.getDimensionPixelSize(R.dimen.tamano_texto_toolbar)
+        spannableString.setSpan(
+            AbsoluteSizeSpan(tamanoTextoEnPixeles),
+            0,
+            spannableString.length,
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+
+        // Establezco el título de la barra de herramientas con el SpannableString
+        supportActionBar?.title = spannableString
     }
 
     private fun configurarBotonAplicarFiltros() {
@@ -209,7 +241,7 @@ class FiltradoActivity : AppCompatActivity() {
 
             val importe = binding.seekbarImporte.progress.toDouble()
             val filtro = Filtro(fechaHastaReal, fechaDesdeReal, importe, estadoCheckBox)
-            intent.putExtra("datosFiltrados", gson.toJson(filtro))
+            intent.putExtra(Constantes.DATOS_FILTRADOS, gson.toJson(filtro))
             cargarPreferenciasCompartidas()
             intentLaunchActivityResult.launch(intent)
             finish()
