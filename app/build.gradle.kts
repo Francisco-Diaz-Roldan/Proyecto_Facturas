@@ -80,4 +80,7 @@ dependencies {
 
     // Para implementar el CardView
     implementation ("androidx.cardview:cardview:1.0.0")
+
+    //Para Retromock
+    implementation ("co.infinum:retromock:1.1.0")
 }

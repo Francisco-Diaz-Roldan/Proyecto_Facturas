@@ -87,14 +87,15 @@ class FiltradoActivity : AppCompatActivity() {
 
     private fun inicializarintentLaunchActivityResult() {
         intentLaunchActivityResult =
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-                    result: ActivityResult ->
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
                 if (result.resultCode == RESULT_OK) {
-                    val maxImporte = result.data?.extras?.getDouble(Constantes.VALOR_MAX) ?: 0.0
                     val filtroJson = result.data?.extras?.getString(Constantes.DATOS_FILTRADOS)
+                   // println("El valor máximo es:")
                     if (filtroJson != null) {
                         val gson = Gson()
                         val objFiltro = gson.fromJson(filtroJson, MainActivity::class.java)
+                        val valorMax = result.data?.extras?.getDouble(Constantes.VALOR_MAX) ?: 0.0
+                    //    println("El valor máximo es: $valorMax")
                     }
                 }
             }
@@ -174,6 +175,7 @@ class FiltradoActivity : AppCompatActivity() {
     private fun configurarSeekbar() {
         //Recibo el valor máximo de las facturas de la ventana anterior y lo redondeo
         val valorMax = calcularValorMax()
+        Log.d("valorMax", valorMax.toString())
 
         //Configuro la seekbar y los textos con sus valores min, max y actuales
         seekbarImporte = binding.seekbarImporte
@@ -269,7 +271,6 @@ class FiltradoActivity : AppCompatActivity() {
         checkboxPendientesDePago = binding.checkboxPendientesDePago
         checkboxPlanDePago = binding.checkboxPlanDePago
     }
-
 
     private fun resetearFecha() {
         btnDesde.text = getString(R.string.dia_mes_ano)

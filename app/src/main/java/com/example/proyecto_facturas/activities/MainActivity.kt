@@ -34,7 +34,6 @@ import com.example.proyecto_facturas.constantes.Constantes.Companion.CUOTA_FIJA
 import com.example.proyecto_facturas.constantes.Constantes.Companion.PAGADAS
 import com.example.proyecto_facturas.constantes.Constantes.Companion.PENDIENTES_DE_PAGO
 import com.example.proyecto_facturas.constantes.Constantes.Companion.PLAN_DE_PAGO
-import com.example.proyecto_facturas.constantes.Constantes.Companion.VALOR_MAX
 import com.example.proyecto_facturas.data.rom.Factura
 import com.example.proyecto_facturas.databinding.ActivityMainBinding
 import com.example.proyecto_facturas.viewmodel.FacturaViewModel
@@ -50,7 +49,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var facturaAdapter: FacturaAdapter
-    private var valorMax: Double = 0.0
+    private var valorMax: Double = Double.MIN_VALUE // Inicio por defecto el valor más pequeño
     private var filtro: Filtro? = null
     private lateinit var intentLaunchActivityResult: ActivityResultLauncher<Intent>
     private val preferenciasCompartidas: SharedPreferences by lazy {
@@ -61,6 +60,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        onBackPressedDispatcher.addCallback(this, onBackCallback)//Para salir de la app al darle a atrás
 
         inicializarAdapter()
 
@@ -77,16 +77,21 @@ class MainActivity : AppCompatActivity() {
         inicializarintentLaunchActivityResult()
     }
 
+    //TODO cambiar el activity for result y añadir las fechas como con el valorMax
+
+    //TODO añadir animaciones de lotties
     private fun inicializarintentLaunchActivityResult() {
         intentLaunchActivityResult =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult())
             { result: ActivityResult ->
                 if (result.resultCode == RESULT_OK) {
-                    val maxImporte = result.data?.extras?.getDouble(Constantes.VALOR_MAX) ?: 0.0// De no ser una constante tendría que ir entre comillado
-                    val filtroJson = result.data?.extras?.getString("datosFiltrados")
+                    valorMax = result.data?.extras?.getDouble(Constantes.VALOR_MAX)
+                        ?: 0.0// De no ser una constante tendría que ir entre comillado
+                    val filtroJson = result.data?.extras?.getString(Constantes.DATOS_FILTRADOS)
                     if (filtroJson != null) {
                         val gson = Gson()
                         val objetoFiltrado = gson.fromJson(filtroJson, FiltradoActivity::class.java)
+                        println(objetoFiltrado)
                     }
                 }
             }
@@ -137,7 +142,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             // Para Filtrar los datos. Se obtienen los datos de la actividad FiltradoActivity
-            val datosFiltrados = intent.getStringExtra("datosFiltrados")
+            val datosFiltrados = intent.getStringExtra(Constantes.DATOS_FILTRADOS)
             if (datosFiltrados != null) {
                 // Convierto strings JSON (datosFiltrados) en objeto de tipo Filtro utilizando Gson
                 val filtrosAplicados = Gson().fromJson(datosFiltrados, Filtro::class.java)
@@ -183,7 +188,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
 
     private fun inicializarViewModel() {
         //Inicializo la configuración del RecyclerView
@@ -343,10 +347,10 @@ class MainActivity : AppCompatActivity() {
         return when (item.itemId) {
             R.id.menuFiltrar -> {
                 val intent = Intent(this, FiltradoActivity::class.java)
-                intent.putExtra("valorMax", valorMax)
+                intent.putExtra(Constantes.VALOR_MAX, valorMax)
                 if (filtro != null) {
                     val gson = Gson()
-                    intent.putExtra("datosFiltrados", gson.toJson(filtro))
+                    intent.putExtra(Constantes.DATOS_FILTRADOS, gson.toJson(filtro))
                 }
                 intentLaunchActivityResult.launch(intent)
                 true
@@ -360,12 +364,12 @@ class MainActivity : AppCompatActivity() {
     private fun guardarListaFiltradaEnPreferencias(listaFiltrada: List<Factura>) {
         val gson = Gson()
         val listaFiltradaJson = gson.toJson(listaFiltrada)
-        preferenciasCompartidas.edit().putString("lista_filtrada", listaFiltradaJson).apply()
+        preferenciasCompartidas.edit().putString(Constantes.LISTA_FILTRADA, listaFiltradaJson).apply()
     }
 
     private fun obtenerListaFiltradaDesdePreferencias(): List<Factura>? {
         val listaFiltradaJson = preferenciasCompartidas.getString(
-            "lista_filtrada",
+            Constantes.LISTA_FILTRADA,
             null
         )
         if (listaFiltradaJson != null) {
@@ -376,11 +380,9 @@ class MainActivity : AppCompatActivity() {
         return null
     }
 
-    /*
-    @Deprecated("Deprecated in Java")
-    override fun onBackPressed() {// Al darle a atrás en MainActivity, cierra la aplicación
-        super.onBackPressed()
-        facturaAdapter.getListaFacturas()?.let { guardarListaFiltradaEnPreferencias(it) }
-        finishAffinity()
-    }*/
+    private val onBackCallback = object : OnBackPressedCallback(true){
+        override fun handleOnBackPressed() {
+            finishAffinity()
+        }
+    }
 }
