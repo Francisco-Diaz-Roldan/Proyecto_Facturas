@@ -181,7 +181,6 @@ class FiltradoActivity : AppCompatActivity() {
     }
 
 
-
     private fun inicializarPreferenciasCompartidas() {
         preferenciasCompartidas = getSharedPreferences(
             "preferencias_filtrado",
@@ -192,7 +191,6 @@ class FiltradoActivity : AppCompatActivity() {
     private fun configurarSeekbar() {
         //Recibo el valor máximo de las facturas de la ventana anterior y lo redondeo
         val valorMax = calcularValorMax()
-        Log.d("valorMax", valorMax.toString())
 
         //Configuro la seekbar y los textos con sus valores min, max y actuales
         seekbarImporte = binding.seekbarImporte
@@ -367,7 +365,6 @@ class FiltradoActivity : AppCompatActivity() {
         if (filtroJson != null) {
             val gson = Gson()
             filtro = gson.fromJson(filtroJson, Filtro::class.java)
-            Log.d("FILTROS", filtro.toString())
             filtro?.let { nonNullFilter ->
                 cargarFiltros(nonNullFilter)
             }

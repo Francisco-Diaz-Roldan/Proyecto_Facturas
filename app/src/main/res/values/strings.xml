@@ -1,18 +1,37 @@
 <resources>
+    <!--String empleado para el nombre de la app-->
     <string name="app_name">Proyecto_Facturas</string>
+
+    <!--Strings relativos a las facturas recibidas-->
     <string name="con_fecha_de_emision">Con fecha de emisión</string>
-    <string name="desde">Desde:</string>
-    <string name="dia_mes_ano">día/mes/año</string>
-    <string name="hasta">Hasta:</string>
     <string name="por_un_importe">Por un importe</string>
     <string name="por_estado">Por estado</string>
+
+    <!--Strings  relativos al estado de las facturas (checkboxes)-->
     <string name="pagadas">Pagadas</string>
     <string name="anuladas">Anuladas</string>
     <string name="cuota_fija">Cuota Fija</string>
     <string name="pendientes_de_pago">Pendientes de pago</string>
     <string name="plan_de_pago">Plan de pago</string>
+
+    <!--Strings relativos a los botones de fecha-->
+    <string name="desde">Desde:</string>
+    <string name="hasta">Hasta:</string>
+    <string name="dia_mes_ano">día/mes/año</string>
+
+    <!--Strings relativos a los botones de lo filtros-->
     <string name="aplicar">Aplicar</string>
     <string name="eliminar_filtros">Eliminar filtros</string>
+
+    <!--Strings relativos a a seekbar-->
+    <string name="valoractual">ValorActual</string>
+    <string name="valor_maximo">Valor Maximo</string>
+    <string name="valorminimo">ValorMinimo</string>
+
+    <!--Strings relativo al switch-->
+    <string name="mock">Mock</string>
+
+    <!--Strings empleados en la MainActivity-->
     <string name="fecha">Fecha</string>
     <string name="estado_de_pago">Estado de Pago</string>
     <string name="informacion">Información</string>
@@ -21,8 +40,5 @@
     <string name="cerrar">Cerrar</string>
     <string name="_0e">0€</string>
     <string name="no_hay_facturas_disponibles">No hay facturas disponibles</string>
-    <string name="valoractual">ValorActual</string>
-    <string name="valor_maximo">Valor Maximo</string>
-    <string name="valorminimo">ValorMinimo</string>
-    <string name="mock">Mock</string>
+
 </resources>

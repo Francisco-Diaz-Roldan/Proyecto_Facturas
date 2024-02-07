@@ -1,9 +1,11 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.Proyecto_Facturas" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+        <!-- Customize your light theme here. -->
+        <!-- Para cambiar los colores primario y secundario de la app -->
         <item name="colorPrimary">@color/green</item>
         <item name="colorSecondary">@color/green</item>
+        <!-- Para poner el fondo de color blanco -->
+        <item name="android:windowBackground">@android:color/white</item>
     </style>
 </resources>
