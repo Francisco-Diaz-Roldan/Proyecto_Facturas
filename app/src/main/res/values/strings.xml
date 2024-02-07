@@ -24,4 +24,5 @@
     <string name="valoractual">ValorActual</string>
     <string name="valor_maximo">Valor Maximo</string>
     <string name="valorminimo">ValorMinimo</string>
+    <string name="mock">Mock</string>
 </resources>

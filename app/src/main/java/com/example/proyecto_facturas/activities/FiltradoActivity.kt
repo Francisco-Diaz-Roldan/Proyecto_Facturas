@@ -32,11 +32,13 @@ import com.example.proyecto_facturas.R
 import com.example.proyecto_facturas.constantes.Constantes
 import com.example.proyecto_facturas.constantes.Constantes.Companion.ANULADAS
 import com.example.proyecto_facturas.constantes.Constantes.Companion.CUOTA_FIJA
+import com.example.proyecto_facturas.constantes.Constantes.Companion.ESTADO_FILTRO
 import com.example.proyecto_facturas.constantes.Constantes.Companion.PAGADAS
 import com.example.proyecto_facturas.constantes.Constantes.Companion.PENDIENTES_DE_PAGO
 import com.example.proyecto_facturas.constantes.Constantes.Companion.PLAN_DE_PAGO
 import com.example.proyecto_facturas.databinding.ActivityFiltradoBinding
 import com.google.gson.Gson
+import java.util.Date
 import java.util.Locale
 
 class FiltradoActivity : AppCompatActivity() {
@@ -55,6 +57,7 @@ class FiltradoActivity : AppCompatActivity() {
     private lateinit var checkboxPlanDePago: CheckBox
     private lateinit var preferenciasCompartidas: SharedPreferences
     private lateinit var intentLaunchActivityResult: ActivityResultLauncher<Intent>
+    private var filtro:Filtro?= null
 
     private var fechaDesdeSeleccionada = false
     private var fechaHastaSeleccionada = false
@@ -90,7 +93,7 @@ class FiltradoActivity : AppCompatActivity() {
             registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
                 if (result.resultCode == RESULT_OK) {
                     val filtroJson = result.data?.extras?.getString(Constantes.DATOS_FILTRADOS)
-                   // println("El valor máximo es:")
+                    println("El valor máximo es:")
                     if (filtroJson != null) {
                         val gson = Gson()
                         val objFiltro = gson.fromJson(filtroJson, MainActivity::class.java)
@@ -150,6 +153,11 @@ class FiltradoActivity : AppCompatActivity() {
             calendarioMax.add(Calendar.YEAR, 100) // Establezco la fecha maxima en 100 años
             datePickerDialog.datePicker.maxDate = calendarioMax.timeInMillis
         }
+
+        if (btnHasta.text != getString(R.string.dia_mes_ano)){
+            val maxDate = obtenerFechaHasta(btnHasta.text.toString())
+            datePickerDialog.datePicker.maxDate = maxDate.time
+        }
         datePickerDialog.show()
     }
 
@@ -164,6 +172,15 @@ class FiltradoActivity : AppCompatActivity() {
         }
         return 0L // En caso de error devuelve el valor predeterminado
     }
+
+
+    // Función para convertir el texto del botón a una fecha
+    private fun obtenerFechaHasta(dateText: String): Date {
+        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        return dateFormat.parse(dateText) ?: Date()
+    }
+
+
 
     private fun inicializarPreferenciasCompartidas() {
         preferenciasCompartidas = getSharedPreferences(
@@ -342,23 +359,19 @@ class FiltradoActivity : AppCompatActivity() {
         preferencias.edit().putString("ESTADO_FILTRO", jsonFiltro).apply()
     }
 
-    private fun aplicarFiltrosGuardados() {
-        val preferencias = getSharedPreferences("preferencias_filtrado", Context.MODE_PRIVATE)
-        val jsonFiltro = preferencias.getString("ESTADO_FILTRO", null)
-        val gson = instanciarGson()
-        // Creo un filtro predeterminado en caso de que no haya ningún filtro almacenado
-        val filtroPredeterminado = Filtro(
-            "fechaHasta", "fechaDesde",
-            0.0, hashMapOf()
-        )
-        // Si jsonFiltro no es nulo se pasa a un objeto Filtro utilizando Gson
-        val filtro = jsonFiltro?.let {
-            gson.fromJson(it, Filtro::class.java)
-        } ?: filtroPredeterminado // Si jsonFiltro es nulo, se asigna el filtro predeterminado
-        cargarFiltros(filtro)
 
-        // Actualizo la SeekBar con el valor guardado
-        seekbarImporte.progress = filtro.importe.toInt()
+    private fun aplicarFiltrosGuardados() {
+        val preferencias = getSharedPreferences(("preferencias_filtrado"), Context.MODE_PRIVATE)
+        val filtroJson = preferencias.getString(ESTADO_FILTRO, null)
+
+        if (filtroJson != null) {
+            val gson = Gson()
+            filtro = gson.fromJson(filtroJson, Filtro::class.java)
+            Log.d("FILTROS", filtro.toString())
+            filtro?.let { nonNullFilter ->
+                cargarFiltros(nonNullFilter)
+            }
+        }
     }
 
     private fun cargarFiltros(filtro: Filtro) {

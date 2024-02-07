@@ -2,7 +2,11 @@ package com.example.proyecto_facturas.repository
 
 import android.util.Log
 import androidx.lifecycle.LiveData
-import com.example.proyecto_facturas.data.retrofit.RetrofitServiceInterface
+import com.example.proyecto_facturas.constantes.Constantes.Companion.FICTICIO
+import com.example.proyecto_facturas.constantes.Constantes.Companion.REAL
+import com.example.proyecto_facturas.data.retrofit.APIRetrofitServiceInterface
+import com.example.proyecto_facturas.data.retrofit.APIRetromockServiceInterface
+import com.example.proyecto_facturas.data.retrofit.ServiceInterface
 import com.example.proyecto_facturas.data.retrofit.model.FacturaRepositoriesListResponse
 import com.example.proyecto_facturas.data.rom.FacturaDAO
 import com.example.proyecto_facturas.data.rom.Factura
@@ -13,8 +17,27 @@ import javax.inject.Inject
 
 class FacturaRepository @Inject constructor(
     private val facturaDAO: FacturaDAO,
-    private val retrofitServiceInterface: RetrofitServiceInterface
-) {
+    private val retrofitServiceInterface: APIRetrofitServiceInterface,
+    private var retromockServiceInterface: APIRetromockServiceInterface,
+    ) {
+    private lateinit var servicioInterface: ServiceInterface
+    private var datos = REAL
+
+    fun setDatos(newDatos: String){
+        datos = newDatos
+        decidirServicio()
+    }
+
+    init {decidirServicio() }
+
+    fun decidirServicio() {
+        if (datos == FICTICIO){
+            servicioInterface = retromockServiceInterface
+        } else{
+            servicioInterface = retrofitServiceInterface
+        }
+    }
+
     fun obtenerFacturasDesdeRoom(): LiveData<List<Factura>> {
         return facturaDAO.getAllFacturas()
     }
@@ -25,7 +48,7 @@ class FacturaRepository @Inject constructor(
 
     fun llamarApi() {
         val call: Call<FacturaRepositoriesListResponse> =
-            retrofitServiceInterface.obtenerFacturasApi()
+            servicioInterface.obtenerFacturasApi()
         call.enqueue(object : Callback<FacturaRepositoriesListResponse> {
             override fun onResponse(
                 call: Call<FacturaRepositoriesListResponse>,

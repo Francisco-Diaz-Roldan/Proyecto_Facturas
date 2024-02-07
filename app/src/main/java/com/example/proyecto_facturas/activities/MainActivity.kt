@@ -12,9 +12,11 @@ import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.AbsoluteSizeSpan
 import android.text.style.StyleSpan
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.Switch
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
@@ -31,9 +33,11 @@ import com.example.proyecto_facturas.adapter.FacturaAdapter
 import com.example.proyecto_facturas.constantes.Constantes
 import com.example.proyecto_facturas.constantes.Constantes.Companion.ANULADAS
 import com.example.proyecto_facturas.constantes.Constantes.Companion.CUOTA_FIJA
+import com.example.proyecto_facturas.constantes.Constantes.Companion.FICTICIO
 import com.example.proyecto_facturas.constantes.Constantes.Companion.PAGADAS
 import com.example.proyecto_facturas.constantes.Constantes.Companion.PENDIENTES_DE_PAGO
 import com.example.proyecto_facturas.constantes.Constantes.Companion.PLAN_DE_PAGO
+import com.example.proyecto_facturas.constantes.Constantes.Companion.REAL
 import com.example.proyecto_facturas.data.rom.Factura
 import com.example.proyecto_facturas.databinding.ActivityMainBinding
 import com.example.proyecto_facturas.viewmodel.FacturaViewModel
@@ -51,6 +55,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var facturaAdapter: FacturaAdapter
     private var valorMax: Double = Double.MIN_VALUE // Inicio por defecto el valor más pequeño
     private var filtro: Filtro? = null
+    @SuppressLint("UseSwitchCompatOrMaterialCode")
+    private lateinit var switch: Switch
     private lateinit var intentLaunchActivityResult: ActivityResultLauncher<Intent>
     private val preferenciasCompartidas: SharedPreferences by lazy {
         getSharedPreferences("preferencias_app", Context.MODE_PRIVATE)
@@ -76,8 +82,6 @@ class MainActivity : AppCompatActivity() {
 
         inicializarintentLaunchActivityResult()
     }
-
-    //TODO cambiar el activity for result y añadir las fechas como con el valorMax
 
     //TODO añadir animaciones de lotties
     private fun inicializarintentLaunchActivityResult() {
@@ -140,6 +144,15 @@ class MainActivity : AppCompatActivity() {
             if (listaCompleta.isEmpty()) {
                 viewModel.llamarApi()
             }
+            binding.switch1.setOnClickListener{
+                if(binding.switch1.isChecked){
+                    viewModel.cambiarServicio(FICTICIO)
+                    viewModel.llamarApi()
+                }else{
+                    viewModel.cambiarServicio(REAL)
+                    viewModel.llamarApi()
+                }
+            }
 
             // Para Filtrar los datos. Se obtienen los datos de la actividad FiltradoActivity
             val datosFiltrados = intent.getStringExtra(Constantes.DATOS_FILTRADOS)
@@ -151,7 +164,7 @@ class MainActivity : AppCompatActivity() {
                 var listaFiltrada = comprobarFechaFiltrado(
                     filtrosAplicados.fechaDesde,
                     filtrosAplicados.fechaHasta,
-                    listaCompleta // Uso la lista completa aquí
+                    listaCompleta // Uso la lista completa iterada aquí
                 )
 
                 // Aplico los filtros de importe
@@ -169,9 +182,6 @@ class MainActivity : AppCompatActivity() {
 
                 // Muestro por pantalla la lista filtrada
                 facturaAdapter.setListaFacturas(listaFiltrada)
-
-                // Actualizo el valor máximo solo con la lista completa
-                valorMax = calcularMaximo(listaCompleta)
             }
 
             // Si hay preferencias compartidas y no hay datos filtrados, cargo la lista filtrada
@@ -182,10 +192,9 @@ class MainActivity : AppCompatActivity() {
 
                 // Muestro por pantalla la lista filtrada guardada
                 facturaAdapter.setListaFacturas(listaFiltradaGuardada)
-
-                // Actualizo el valor máximo solo con la lista completa
-                valorMax = calcularMaximo(listaCompleta)
             }
+            // Actualizo el valor máximo solo con la lista completa
+            valorMax = calcularMaximo(listaCompleta)
         }
     }
 
@@ -352,6 +361,7 @@ class MainActivity : AppCompatActivity() {
                     val gson = Gson()
                     intent.putExtra(Constantes.DATOS_FILTRADOS, gson.toJson(filtro))
                 }
+                Log.d("patata", valorMax.toString())
                 intentLaunchActivityResult.launch(intent)
                 true
             }

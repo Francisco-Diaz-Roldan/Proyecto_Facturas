@@ -18,4 +18,8 @@ class FacturaViewModel @Inject constructor(private val facturaRepository: Factur
     fun llamarApi() {
         facturaRepository.llamarApi()
     }
+
+    fun cambiarServicio(newDatos: String){
+        facturaRepository.setDatos(newDatos)
+    }
 }

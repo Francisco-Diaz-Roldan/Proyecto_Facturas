@@ -13,6 +13,6 @@ class Constantes {//Esto son valores de variables
         const val BASE_URL = "https://viewnextandroid.wiremockapi.cloud/"
         const val FICTICIO = "ficticio"
         const val REAL = "real"
-        const val NO_IMPLEMENTADO = "No implementado"
+        const val ESTADO_FILTRO = "ESTADO_FILTRO"
     }
 }
