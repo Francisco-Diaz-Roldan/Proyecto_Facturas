@@ -44,6 +44,7 @@ import com.example.proyecto_facturas.viewmodel.FacturaViewModel
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import dagger.hilt.android.AndroidEntryPoint
+import java.text.ParseException
 import java.util.Date
 import java.util.Locale
 
@@ -55,8 +56,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var facturaAdapter: FacturaAdapter
     private var valorMax: Double = Double.MIN_VALUE // Inicio por defecto el valor más pequeño
     private var filtro: Filtro? = null
-    @SuppressLint("UseSwitchCompatOrMaterialCode")
-    private lateinit var switch: Switch
     private lateinit var intentLaunchActivityResult: ActivityResultLauncher<Intent>
     private val preferenciasCompartidas: SharedPreferences by lazy {
         getSharedPreferences("preferencias_app", Context.MODE_PRIVATE)
@@ -83,7 +82,6 @@ class MainActivity : AppCompatActivity() {
         inicializarintentLaunchActivityResult()
     }
 
-    //TODO añadir animaciones de lotties
     private fun inicializarintentLaunchActivityResult() {
         intentLaunchActivityResult =
             registerForActivityResult(ActivityResultContracts.StartActivityForResult())
@@ -99,6 +97,13 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
+        val estadoSwitch = obtenerEstadoSwitchPreferenciasCOmpartidas()
+        binding.switchRetromock.isChecked = estadoSwitch
+    }
+
+    private fun obtenerEstadoSwitchPreferenciasCOmpartidas(): Boolean {
+        val prefs: SharedPreferences = getPreferences(MODE_PRIVATE)
+        return prefs.getBoolean("SWITCH_STATE", false)
     }
 
     private fun configurarFacturaAdapter() {
@@ -131,11 +136,11 @@ class MainActivity : AppCompatActivity() {
         // Inicializa la vista(ViewModel) y las listas de facturas
         val viewModel = ViewModelProvider(this)[FacturaViewModel::class.java]
 
-        // Obtener la lista filtrada desde las preferencias compartidas
+        // Obtengo la lista filtrada desde las preferencias compartidas
         val listaFiltradaGuardada = obtenerListaFiltradaDesdePreferencias()
 
         viewModel.getAllRepositoryList().observe(this) { listaCompleta ->
-            // Usar la lista filtrada si está presente; de lo contrario, usar la lista completa
+            // Uso la lista filtrada si está presente; de lo contrario, usar la lista completa
             val listaFactura = listaFiltradaGuardada ?: listaCompleta
 
             facturaAdapter.setListaFacturas(listaFactura)
@@ -144,8 +149,8 @@ class MainActivity : AppCompatActivity() {
             if (listaCompleta.isEmpty()) {
                 viewModel.llamarApi()
             }
-            binding.switch1.setOnClickListener{
-                if(binding.switch1.isChecked){
+            binding.switchRetromock.setOnClickListener{
+                if(binding.switchRetromock.isChecked){
                     viewModel.cambiarServicio(FICTICIO)
                     viewModel.llamarApi()
                 }else{
@@ -207,7 +212,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun comprobarFechaFiltrado(// Para los filtros de la fecha
+    /*private fun comprobarFechaFiltrado(// Para los filtros de la fecha
         fechaDesdeStr: String,
         fechaHastaStr: String,
         listaFacturas: List<Factura>
@@ -235,6 +240,74 @@ class MainActivity : AppCompatActivity() {
             return listaFacturas
         }
         return listaFiltradaPorFecha //Devuelvo la lista filtrada por fecha
+    }*/
+
+   /* private fun comprobarFechaFiltrado(
+        fechaDesdeStr: String,
+        fechaHastaStr: String,
+        listaFacturas: List<Factura>
+    ): List<Factura> {
+        // Creo una lista para almacenar las facturas filtradas por fecha
+        val listaFiltradaPorFecha = mutableListOf<Factura>()
+
+        // Verifico si se ha seleccionado un rango de fechas en la pantalla de filtros
+        if (fechaDesdeStr != getString(R.string.dia_mes_ano) && fechaHastaStr != getString(R.string.dia_mes_ano)) {
+            // Creo un formato de fecha para convertir las cadenas de fecha a objetos Date
+            val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+
+            try {
+                // Convierto las cadenas de fecha a objetos Date
+                val fechaDesde: Date = sdf.parse(fechaDesdeStr) ?: Date(Long.MIN_VALUE)
+                val fechaHasta: Date = sdf.parse(fechaHastaStr) ?: Date(Long.MAX_VALUE)
+
+                // Itero sobre la lista completa de facturas
+                for (factura in listaFacturas) {
+                    // Obtengo la fecha de la factura como un objeto Date
+                    val fechaFactura: Date = sdf.parse(factura.fecha) ?: Date()
+
+                    // Verifico si la fecha de la factura está dentro del rango seleccionado
+                    if (!fechaFactura.before(fechaDesde) && !fechaFactura.after(fechaHasta)) {
+                        // Agrego la factura a la lista filtrada
+                        listaFiltradaPorFecha.add(factura)
+                    }
+                }
+            } catch (e: ParseException) {
+                // Manejo de excepciones en caso de errores al analizar fechas
+                e.printStackTrace()
+            }
+        } else {
+            // Si no se ha modificado la lista en la pantalla de filtros, devuelvo la lista original
+            return listaFacturas
+        }
+
+        // Devuelvo la lista filtrada por fecha
+        return listaFiltradaPorFecha
+    }*/
+
+    private fun comprobarFechaFiltrado(
+        fechaDesdeStr: String,
+        fechaHastaStr: String,
+        listaFacturas: List<Factura>
+    ): List<Factura> {
+        if (fechaDesdeStr == getString(R.string.dia_mes_ano) || fechaHastaStr == getString(R.string.dia_mes_ano)) {
+            // Si no se ha modificado la lista en la pantalla de filtros, devuelvo la lista original
+            return listaFacturas
+        }
+
+        val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        try {
+            val fechaDesde: Date = sdf.parse(fechaDesdeStr) ?: Date(Long.MIN_VALUE)
+            val fechaHasta: Date = sdf.parse(fechaHastaStr) ?: Date(Long.MAX_VALUE)
+
+            return listaFacturas.filter { factura ->
+                val fechaFactura: Date = sdf.parse(factura.fecha) ?: Date()
+                !fechaFactura.before(fechaDesde) && !fechaFactura.after(fechaHasta)
+            }
+        } catch (e: ParseException) {
+            // Manejo de excepciones en caso de errores al analizar fechas
+            e.printStackTrace()
+            return emptyList()
+        }
     }
 
     private fun comprobarImporteFiltrado(//Para filtrar por importe
@@ -361,7 +434,6 @@ class MainActivity : AppCompatActivity() {
                     val gson = Gson()
                     intent.putExtra(Constantes.DATOS_FILTRADOS, gson.toJson(filtro))
                 }
-                Log.d("patata", valorMax.toString())
                 intentLaunchActivityResult.launch(intent)
                 true
             }
