@@ -14,5 +14,6 @@ class Constantes {//Esto son valores de variables
         const val FICTICIO = "ficticio"
         const val REAL = "real"
         const val ESTADO_FILTRO = "ESTADO_FILTRO"
+        const val ESTADO_SWITCH = "ESTADO_SWITCH"
     }
 }

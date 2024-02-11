@@ -173,8 +173,6 @@ class FiltradoActivity : AppCompatActivity() {
         return 0L // En caso de error devuelve el valor predeterminado
     }
 
-
-    // Función para convertir el texto del botón a una fecha
     private fun obtenerFechaHasta(dateText: String): Date {
         val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         return dateFormat.parse(dateText) ?: Date()
@@ -258,6 +256,7 @@ class FiltradoActivity : AppCompatActivity() {
 
             val importe = binding.seekbarImporte.progress.toDouble()
             val filtro = Filtro(fechaHastaReal, fechaDesdeReal, importe, estadoCheckBox)
+            Log.d("asasas", "Filtro aplicado: $filtro")
             intent.putExtra(Constantes.DATOS_FILTRADOS, gson.toJson(filtro))
             cargarPreferenciasCompartidas()
             intentLaunchActivityResult.launch(intent)

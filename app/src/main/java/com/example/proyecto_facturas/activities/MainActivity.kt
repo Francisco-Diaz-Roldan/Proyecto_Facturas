@@ -16,7 +16,6 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.Switch
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
@@ -33,6 +32,8 @@ import com.example.proyecto_facturas.adapter.FacturaAdapter
 import com.example.proyecto_facturas.constantes.Constantes
 import com.example.proyecto_facturas.constantes.Constantes.Companion.ANULADAS
 import com.example.proyecto_facturas.constantes.Constantes.Companion.CUOTA_FIJA
+import com.example.proyecto_facturas.constantes.Constantes.Companion.DATOS_FILTRADOS
+import com.example.proyecto_facturas.constantes.Constantes.Companion.ESTADO_SWITCH
 import com.example.proyecto_facturas.constantes.Constantes.Companion.FICTICIO
 import com.example.proyecto_facturas.constantes.Constantes.Companion.PAGADAS
 import com.example.proyecto_facturas.constantes.Constantes.Companion.PENDIENTES_DE_PAGO
@@ -89,7 +90,8 @@ class MainActivity : AppCompatActivity() {
                 if (result.resultCode == RESULT_OK) {
                     valorMax = result.data?.extras?.getDouble(Constantes.VALOR_MAX)
                         ?: 0.0// De no ser una constante tendría que ir entre comillado
-                    val filtroJson = result.data?.extras?.getString(Constantes.DATOS_FILTRADOS)
+                    val filtroJson = result.data?.extras?.getString(DATOS_FILTRADOS)
+                    Log.d("hola", "Filtro recibido: $filtroJson") //TODO no se reciben bien las preferencias de fecha
                     if (filtroJson != null) {
                         val gson = Gson()
                         val objetoFiltrado = gson.fromJson(filtroJson, FiltradoActivity::class.java)
@@ -97,13 +99,18 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
-        val estadoSwitch = obtenerEstadoSwitchPreferenciasCOmpartidas()
+        val estadoSwitch = cargarEstadoSwitch()
         binding.switchRetromock.isChecked = estadoSwitch
     }
 
-    private fun obtenerEstadoSwitchPreferenciasCOmpartidas(): Boolean {
+    private fun guardarEstadoSwitch(state: Boolean) {
+        val prefs = getPreferences(MODE_PRIVATE)
+        prefs.edit().putBoolean(ESTADO_SWITCH, state).apply()
+    }
+
+    private fun cargarEstadoSwitch(): Boolean {
         val prefs: SharedPreferences = getPreferences(MODE_PRIVATE)
-        return prefs.getBoolean("SWITCH_STATE", false)
+        return prefs.getBoolean(ESTADO_SWITCH, false)
     }
 
     private fun configurarFacturaAdapter() {
@@ -150,6 +157,8 @@ class MainActivity : AppCompatActivity() {
                 viewModel.llamarApi()
             }
             binding.switchRetromock.setOnClickListener{
+                val isChecked = binding.switchRetromock.isChecked
+                guardarEstadoSwitch(isChecked) 
                 if(binding.switchRetromock.isChecked){
                     viewModel.cambiarServicio(FICTICIO)
                     viewModel.llamarApi()
@@ -289,6 +298,7 @@ class MainActivity : AppCompatActivity() {
         fechaHastaStr: String,
         listaFacturas: List<Factura>
     ): List<Factura> {
+        // Compruebo si se ha seleccionado un rango de fechas en la pantalla de filtros
         if (fechaDesdeStr == getString(R.string.dia_mes_ano) || fechaHastaStr == getString(R.string.dia_mes_ano)) {
             // Si no se ha modificado la lista en la pantalla de filtros, devuelvo la lista original
             return listaFacturas
@@ -304,7 +314,6 @@ class MainActivity : AppCompatActivity() {
                 !fechaFactura.before(fechaDesde) && !fechaFactura.after(fechaHasta)
             }
         } catch (e: ParseException) {
-            // Manejo de excepciones en caso de errores al analizar fechas
             e.printStackTrace()
             return emptyList()
         }
