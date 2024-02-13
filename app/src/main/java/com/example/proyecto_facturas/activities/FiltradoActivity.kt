@@ -98,7 +98,6 @@ class FiltradoActivity : AppCompatActivity() {
                         val gson = Gson()
                         val objFiltro = gson.fromJson(filtroJson, MainActivity::class.java)
                         val valorMax = result.data?.extras?.getDouble(Constantes.VALOR_MAX) ?: 0.0
-                    //    println("El valor máximo es: $valorMax")
                     }
                 }
             }
@@ -251,8 +250,8 @@ class FiltradoActivity : AppCompatActivity() {
             val fechaDesde = binding.btnDesde.text.toString()
             val fechaHasta = binding.btnHasta.text.toString()
 
-            val fechaDesdeReal = if (fechaDesdeSeleccionada && fechaHastaSeleccionada) fechaDesde else "01/01/1900"
-            val fechaHastaReal = if (fechaDesdeSeleccionada && fechaHastaSeleccionada) fechaHasta else "31/12/9999"
+            val fechaDesdeReal = if (fechaDesdeSeleccionada) fechaDesde else "01/01/1900"
+            val fechaHastaReal = if (fechaHastaSeleccionada) fechaHasta else "31/12/9999"
 
             val importe = binding.seekbarImporte.progress.toDouble()
             val filtro = Filtro(fechaHastaReal, fechaDesdeReal, importe, estadoCheckBox)

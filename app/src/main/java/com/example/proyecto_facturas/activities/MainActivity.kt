@@ -91,7 +91,7 @@ class MainActivity : AppCompatActivity() {
                     valorMax = result.data?.extras?.getDouble(Constantes.VALOR_MAX)
                         ?: 0.0// De no ser una constante tendría que ir entre comillado
                     val filtroJson = result.data?.extras?.getString(DATOS_FILTRADOS)
-                    Log.d("hola", "Filtro recibido: $filtroJson") //TODO no se reciben bien las preferencias de fecha
+                    Log.d("hola", "Filtro recibido: $filtroJson") //TODO no se reciben  las fechas por separado ni parece que en conjunto
                     if (filtroJson != null) {
                         val gson = Gson()
                         val objetoFiltrado = gson.fromJson(filtroJson, FiltradoActivity::class.java)
@@ -221,7 +221,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /*private fun comprobarFechaFiltrado(// Para los filtros de la fecha
+    private fun comprobarFechaFiltrado(// Para los filtros de la fecha
         fechaDesdeStr: String,
         fechaHastaStr: String,
         listaFacturas: List<Factura>
@@ -249,7 +249,7 @@ class MainActivity : AppCompatActivity() {
             return listaFacturas
         }
         return listaFiltradaPorFecha //Devuelvo la lista filtrada por fecha
-    }*/
+    }
 
    /* private fun comprobarFechaFiltrado(
         fechaDesdeStr: String,
@@ -293,7 +293,7 @@ class MainActivity : AppCompatActivity() {
         return listaFiltradaPorFecha
     }*/
 
-    private fun comprobarFechaFiltrado(
+    /*private fun comprobarFechaFiltrado(
         fechaDesdeStr: String,
         fechaHastaStr: String,
         listaFacturas: List<Factura>
@@ -317,7 +317,7 @@ class MainActivity : AppCompatActivity() {
             e.printStackTrace()
             return emptyList()
         }
-    }
+    }*/
 
     private fun comprobarImporteFiltrado(//Para filtrar por importe
         importe: Double, listaFactura: List<Factura>
