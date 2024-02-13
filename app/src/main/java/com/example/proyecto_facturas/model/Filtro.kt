@@ -1,4 +1,4 @@
-package com.example.proyecto_facturas
+package com.example.proyecto_facturas.model
 
 //la clase Filtro actúa como un modelo de datos que define la estructura de los filtros aplicados
 class Filtro(

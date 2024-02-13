@@ -12,7 +12,6 @@ import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.AbsoluteSizeSpan
 import android.text.style.StyleSpan
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -26,26 +25,28 @@ import androidx.appcompat.widget.Toolbar
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.proyecto_facturas.Filtro
+import com.example.proyecto_facturas.model.Filtro
 import com.example.proyecto_facturas.R
 import com.example.proyecto_facturas.adapter.FacturaAdapter
 import com.example.proyecto_facturas.constantes.Constantes
 import com.example.proyecto_facturas.constantes.Constantes.Companion.ANULADAS
 import com.example.proyecto_facturas.constantes.Constantes.Companion.CUOTA_FIJA
 import com.example.proyecto_facturas.constantes.Constantes.Companion.DATOS_FILTRADOS
+import com.example.proyecto_facturas.constantes.Constantes.Companion.DD_MM_YYYY
 import com.example.proyecto_facturas.constantes.Constantes.Companion.ESTADO_SWITCH
 import com.example.proyecto_facturas.constantes.Constantes.Companion.FICTICIO
 import com.example.proyecto_facturas.constantes.Constantes.Companion.PAGADAS
 import com.example.proyecto_facturas.constantes.Constantes.Companion.PENDIENTES_DE_PAGO
 import com.example.proyecto_facturas.constantes.Constantes.Companion.PLAN_DE_PAGO
+import com.example.proyecto_facturas.constantes.Constantes.Companion.PREFERENCIAS_APP
 import com.example.proyecto_facturas.constantes.Constantes.Companion.REAL
+import com.example.proyecto_facturas.constantes.Constantes.Companion.VALOR_MAX
 import com.example.proyecto_facturas.data.rom.Factura
 import com.example.proyecto_facturas.databinding.ActivityMainBinding
 import com.example.proyecto_facturas.viewmodel.FacturaViewModel
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import dagger.hilt.android.AndroidEntryPoint
-import java.text.ParseException
 import java.util.Date
 import java.util.Locale
 
@@ -59,14 +60,14 @@ class MainActivity : AppCompatActivity() {
     private var filtro: Filtro? = null
     private lateinit var intentLaunchActivityResult: ActivityResultLauncher<Intent>
     private val preferenciasCompartidas: SharedPreferences by lazy {
-        getSharedPreferences("preferencias_app", Context.MODE_PRIVATE)
+        getSharedPreferences(PREFERENCIAS_APP, Context.MODE_PRIVATE)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        onBackPressedDispatcher.addCallback(this, onBackCallback)//Para salir de la app al darle a atrás
+        setContentView(binding.root)// La siguiente liea es para salir de la app al darle a atrás
+        onBackPressedDispatcher.addCallback(this, onBackCallback)
 
         inicializarAdapter()
 
@@ -88,10 +89,9 @@ class MainActivity : AppCompatActivity() {
             registerForActivityResult(ActivityResultContracts.StartActivityForResult())
             { result: ActivityResult ->
                 if (result.resultCode == RESULT_OK) {
-                    valorMax = result.data?.extras?.getDouble(Constantes.VALOR_MAX)
+                    valorMax = result.data?.extras?.getDouble(VALOR_MAX)
                         ?: 0.0// De no ser una constante tendría que ir entre comillado
                     val filtroJson = result.data?.extras?.getString(DATOS_FILTRADOS)
-                    Log.d("hola", "Filtro recibido: $filtroJson") //TODO no se reciben  las fechas por separado ni parece que en conjunto
                     if (filtroJson != null) {
                         val gson = Gson()
                         val objetoFiltrado = gson.fromJson(filtroJson, FiltradoActivity::class.java)
@@ -119,7 +119,8 @@ class MainActivity : AppCompatActivity() {
 
         facturaAdapter.setListaFacturas(listaFiltradaGuardada ?: emptyList())
 
-        this.onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+        this.onBackPressedDispatcher.addCallback(this, object :
+            OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 finish()
             }
@@ -169,7 +170,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             // Para Filtrar los datos. Se obtienen los datos de la actividad FiltradoActivity
-            val datosFiltrados = intent.getStringExtra(Constantes.DATOS_FILTRADOS)
+            val datosFiltrados = intent.getStringExtra(DATOS_FILTRADOS)
             if (datosFiltrados != null) {
                 // Convierto strings JSON (datosFiltrados) en objeto de tipo Filtro utilizando Gson
                 val filtrosAplicados = Gson().fromJson(datosFiltrados, Filtro::class.java)
@@ -233,7 +234,7 @@ class MainActivity : AppCompatActivity() {
         if (fechaDesdeStr != getString(R.string.dia_mes_ano) && fechaHastaStr !=
             getString(R.string.dia_mes_ano)
         ) {
-            val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            val sdf = SimpleDateFormat(DD_MM_YYYY, Locale.getDefault())
             val fechaDesde: Date? = sdf.parse(fechaDesdeStr)
             val fechaHasta: Date? = sdf.parse(fechaHastaStr)
 
@@ -250,74 +251,6 @@ class MainActivity : AppCompatActivity() {
         }
         return listaFiltradaPorFecha //Devuelvo la lista filtrada por fecha
     }
-
-   /* private fun comprobarFechaFiltrado(
-        fechaDesdeStr: String,
-        fechaHastaStr: String,
-        listaFacturas: List<Factura>
-    ): List<Factura> {
-        // Creo una lista para almacenar las facturas filtradas por fecha
-        val listaFiltradaPorFecha = mutableListOf<Factura>()
-
-        // Verifico si se ha seleccionado un rango de fechas en la pantalla de filtros
-        if (fechaDesdeStr != getString(R.string.dia_mes_ano) && fechaHastaStr != getString(R.string.dia_mes_ano)) {
-            // Creo un formato de fecha para convertir las cadenas de fecha a objetos Date
-            val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-
-            try {
-                // Convierto las cadenas de fecha a objetos Date
-                val fechaDesde: Date = sdf.parse(fechaDesdeStr) ?: Date(Long.MIN_VALUE)
-                val fechaHasta: Date = sdf.parse(fechaHastaStr) ?: Date(Long.MAX_VALUE)
-
-                // Itero sobre la lista completa de facturas
-                for (factura in listaFacturas) {
-                    // Obtengo la fecha de la factura como un objeto Date
-                    val fechaFactura: Date = sdf.parse(factura.fecha) ?: Date()
-
-                    // Verifico si la fecha de la factura está dentro del rango seleccionado
-                    if (!fechaFactura.before(fechaDesde) && !fechaFactura.after(fechaHasta)) {
-                        // Agrego la factura a la lista filtrada
-                        listaFiltradaPorFecha.add(factura)
-                    }
-                }
-            } catch (e: ParseException) {
-                // Manejo de excepciones en caso de errores al analizar fechas
-                e.printStackTrace()
-            }
-        } else {
-            // Si no se ha modificado la lista en la pantalla de filtros, devuelvo la lista original
-            return listaFacturas
-        }
-
-        // Devuelvo la lista filtrada por fecha
-        return listaFiltradaPorFecha
-    }*/
-
-    /*private fun comprobarFechaFiltrado(
-        fechaDesdeStr: String,
-        fechaHastaStr: String,
-        listaFacturas: List<Factura>
-    ): List<Factura> {
-        // Compruebo si se ha seleccionado un rango de fechas en la pantalla de filtros
-        if (fechaDesdeStr == getString(R.string.dia_mes_ano) || fechaHastaStr == getString(R.string.dia_mes_ano)) {
-            // Si no se ha modificado la lista en la pantalla de filtros, devuelvo la lista original
-            return listaFacturas
-        }
-
-        val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-        try {
-            val fechaDesde: Date = sdf.parse(fechaDesdeStr) ?: Date(Long.MIN_VALUE)
-            val fechaHasta: Date = sdf.parse(fechaHastaStr) ?: Date(Long.MAX_VALUE)
-
-            return listaFacturas.filter { factura ->
-                val fechaFactura: Date = sdf.parse(factura.fecha) ?: Date()
-                !fechaFactura.before(fechaDesde) && !fechaFactura.after(fechaHasta)
-            }
-        } catch (e: ParseException) {
-            e.printStackTrace()
-            return emptyList()
-        }
-    }*/
 
     private fun comprobarImporteFiltrado(//Para filtrar por importe
         importe: Double, listaFactura: List<Factura>
@@ -455,7 +388,8 @@ class MainActivity : AppCompatActivity() {
     private fun guardarListaFiltradaEnPreferencias(listaFiltrada: List<Factura>) {
         val gson = Gson()
         val listaFiltradaJson = gson.toJson(listaFiltrada)
-        preferenciasCompartidas.edit().putString(Constantes.LISTA_FILTRADA, listaFiltradaJson).apply()
+        preferenciasCompartidas.edit().putString(Constantes.LISTA_FILTRADA, listaFiltradaJson)
+            .apply()
     }
 
     private fun obtenerListaFiltradaDesdePreferencias(): List<Factura>? {

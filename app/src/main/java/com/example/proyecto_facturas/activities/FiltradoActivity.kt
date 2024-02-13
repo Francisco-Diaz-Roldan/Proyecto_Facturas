@@ -27,15 +27,17 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
-import com.example.proyecto_facturas.Filtro
+import com.example.proyecto_facturas.model.Filtro
 import com.example.proyecto_facturas.R
 import com.example.proyecto_facturas.constantes.Constantes
 import com.example.proyecto_facturas.constantes.Constantes.Companion.ANULADAS
 import com.example.proyecto_facturas.constantes.Constantes.Companion.CUOTA_FIJA
+import com.example.proyecto_facturas.constantes.Constantes.Companion.DD_MM_YYYY
 import com.example.proyecto_facturas.constantes.Constantes.Companion.ESTADO_FILTRO
 import com.example.proyecto_facturas.constantes.Constantes.Companion.PAGADAS
 import com.example.proyecto_facturas.constantes.Constantes.Companion.PENDIENTES_DE_PAGO
 import com.example.proyecto_facturas.constantes.Constantes.Companion.PLAN_DE_PAGO
+import com.example.proyecto_facturas.constantes.Constantes.Companion.PREFERENCIAS_FILTRADO
 import com.example.proyecto_facturas.databinding.ActivityFiltradoBinding
 import com.google.gson.Gson
 import java.util.Date
@@ -57,7 +59,7 @@ class FiltradoActivity : AppCompatActivity() {
     private lateinit var checkboxPlanDePago: CheckBox
     private lateinit var preferenciasCompartidas: SharedPreferences
     private lateinit var intentLaunchActivityResult: ActivityResultLauncher<Intent>
-    private var filtro:Filtro?= null
+    private var filtro: Filtro? = null
 
     private var fechaDesdeSeleccionada = false
     private var fechaHastaSeleccionada = false
@@ -67,33 +69,34 @@ class FiltradoActivity : AppCompatActivity() {
         binding = ActivityFiltradoBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        inicializarComponentes()
+
         inicializarPreferenciasCompartidas()
-
-        configurarBotonDesde()
-
-        configurarBotonHasta()
-
-        configurarSeekbar()
-
-        configurarCheckBoxes()
-
-        configurarBotonEliminarFiltros()
-
-        configurarBotonAplicarFiltros()
-
-        configurarToolbar()
 
         aplicarFiltrosGuardados()
 
         inicializarintentLaunchActivityResult()
     }
 
+    private fun inicializarComponentes() {
+        configurarBotonesFecha()
+        configurarSeekbar()
+        configurarCheckBoxes()
+        configurarBotonesFiltros()
+        configurarToolbar()
+    }
+
+    private fun configurarBotonesFiltros() {
+        configurarBotonEliminarFiltros()
+        configurarBotonAplicarFiltros()
+    }
+
     private fun inicializarintentLaunchActivityResult() {
         intentLaunchActivityResult =
-            registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result: ActivityResult ->
+            registerForActivityResult(ActivityResultContracts.StartActivityForResult())
+            { result: ActivityResult ->
                 if (result.resultCode == RESULT_OK) {
                     val filtroJson = result.data?.extras?.getString(Constantes.DATOS_FILTRADOS)
-                    println("El valor máximo es:")
                     if (filtroJson != null) {
                         val gson = Gson()
                         val objFiltro = gson.fromJson(filtroJson, MainActivity::class.java)
@@ -101,6 +104,11 @@ class FiltradoActivity : AppCompatActivity() {
                     }
                 }
             }
+    }
+
+    private fun configurarBotonesFecha() {
+        configurarBotonDesde()
+        configurarBotonHasta()
     }
 
     private fun configurarBotonDesde() {
@@ -153,7 +161,7 @@ class FiltradoActivity : AppCompatActivity() {
             datePickerDialog.datePicker.maxDate = calendarioMax.timeInMillis
         }
 
-        if (btnHasta.text != getString(R.string.dia_mes_ano)){
+        if (btnHasta.text != getString(R.string.dia_mes_ano)) {
             val maxDate = obtenerFechaHasta(btnHasta.text.toString())
             datePickerDialog.datePicker.maxDate = maxDate.time
         }
@@ -161,7 +169,7 @@ class FiltradoActivity : AppCompatActivity() {
     }
 
     private fun obtenerFechaDesde(): Long {
-        val formato = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        val formato = SimpleDateFormat(DD_MM_YYYY, Locale.getDefault())
         val fechaDesdeTexto = btnDesde.text.toString()
         try {
             val fechaDesde = formato.parse(fechaDesdeTexto)
@@ -173,16 +181,14 @@ class FiltradoActivity : AppCompatActivity() {
     }
 
     private fun obtenerFechaHasta(dateText: String): Date {
-        val dateFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        val dateFormat = SimpleDateFormat(DD_MM_YYYY, Locale.getDefault())
         return dateFormat.parse(dateText) ?: Date()
     }
 
 
     private fun inicializarPreferenciasCompartidas() {
         preferenciasCompartidas = getSharedPreferences(
-            "preferencias_filtrado",
-            Context.MODE_PRIVATE
-        )
+            PREFERENCIAS_FILTRADO, Context.MODE_PRIVATE)
     }
 
     private fun configurarSeekbar() {
@@ -255,7 +261,6 @@ class FiltradoActivity : AppCompatActivity() {
 
             val importe = binding.seekbarImporte.progress.toDouble()
             val filtro = Filtro(fechaHastaReal, fechaDesdeReal, importe, estadoCheckBox)
-            Log.d("asasas", "Filtro aplicado: $filtro")
             intent.putExtra(Constantes.DATOS_FILTRADOS, gson.toJson(filtro))
             cargarPreferenciasCompartidas()
             intentLaunchActivityResult.launch(intent)
@@ -263,11 +268,13 @@ class FiltradoActivity : AppCompatActivity() {
         }
     }
 
-    private fun instanciarGson(): Gson { return Gson() }
+    private fun instanciarGson(): Gson {
+        return Gson()
+    }
 
     private fun configurarBotonEliminarFiltros() {
         binding.btnEliminarFiltros.setOnClickListener {
-           resetearParametros()
+            resetearParametros()
         }
     }
 
@@ -316,6 +323,7 @@ class FiltradoActivity : AppCompatActivity() {
                 finish()
                 return true
             }
+
             else -> return super.onOptionsItemSelected(item)
         }
     }
@@ -349,15 +357,15 @@ class FiltradoActivity : AppCompatActivity() {
 
     // Métodos para las preferencias compartidas
     private fun guardarEstadoFiltro(filtro: Filtro) {
-        val preferencias = getSharedPreferences("preferencias_filtrado", Context.MODE_PRIVATE)
+        val preferencias = getSharedPreferences(PREFERENCIAS_FILTRADO, Context.MODE_PRIVATE)
         val gson = instanciarGson()
         val jsonFiltro = gson.toJson(filtro)
-        preferencias.edit().putString("ESTADO_FILTRO", jsonFiltro).apply()
+        preferencias.edit().putString(ESTADO_FILTRO, jsonFiltro).apply()
     }
 
 
     private fun aplicarFiltrosGuardados() {
-        val preferencias = getSharedPreferences(("preferencias_filtrado"), Context.MODE_PRIVATE)
+        val preferencias = getSharedPreferences((PREFERENCIAS_FILTRADO), Context.MODE_PRIVATE)
         val filtroJson = preferencias.getString(ESTADO_FILTRO, null)
 
         if (filtroJson != null) {
