@@ -1,0 +1,25 @@
+{
+  "numFacturas": 9,
+  "facturas": [
+    {
+      "descEstado": "Cuota fija",
+      "importeOrdenacion": 100.60,
+      "fecha": "10/01/2024"
+    },
+    {
+      "descEstado": "Pendiente de pago",
+      "importeOrdenacion": 1.56,
+      "fecha": "07/01/2024"
+    },
+    {
+      "descEstado": "Pagada",
+      "importeOrdenacion": 25.14,
+      "fecha": "05/01/2024"
+    },
+    {
+      "descEstado": "Pagada",
+      "importeOrdenacion": 22.69,
+      "fecha": "08/01/2024"
+    }
+  ]
+}
