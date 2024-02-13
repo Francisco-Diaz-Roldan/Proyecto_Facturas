@@ -214,13 +214,24 @@ class FiltradoActivity : AppCompatActivity() {
     private fun configurarToolbar() {
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
+        cambiarColorToolbar(toolbar)
+        aplicarEstilosTituloToolbar()
+    }
 
+    private fun cambiarColorToolbar(toolbar: Toolbar) {
         // Cambio el color de la barra de herramientas a blanco
         toolbar.setBackgroundColor(Color.parseColor("#FFFFFFFF"))
+    }
 
-        // Creo un SpannableString para aplicar estilos al título
+    private fun aplicarEstilosTituloToolbar() {
         val spannableString = SpannableString("Filtrar facturas")
+        aplicarEstiloBold(spannableString)
+        establecerTamanoTexto(spannableString)
+        // Establezco el título de la barra de herramientas con el SpannableString
+        supportActionBar?.title = spannableString
+    }
 
+    private fun aplicarEstiloBold(spannableString: SpannableString) {
         // Aplico el estilo bold al texto
         spannableString.setSpan(
             StyleSpan(Typeface.BOLD),
@@ -228,7 +239,9 @@ class FiltradoActivity : AppCompatActivity() {
             spannableString.length, // Fin del texto
             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
         )
+    }
 
+    private fun establecerTamanoTexto(spannableString: SpannableString) {
         // Establezco el tamaño de texto en píxeles
         val tamanoTextoEnPixeles = resources.getDimensionPixelSize(R.dimen.tamano_texto_toolbar)
         spannableString.setSpan(
@@ -237,9 +250,6 @@ class FiltradoActivity : AppCompatActivity() {
             spannableString.length,
             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
         )
-
-        // Establezco el título de la barra de herramientas con el SpannableString
-        supportActionBar?.title = spannableString
     }
 
     private fun configurarBotonAplicarFiltros() {
@@ -267,10 +277,6 @@ class FiltradoActivity : AppCompatActivity() {
             intentLaunchActivityResult.launch(intent)
             finish()
         }
-    }
-
-    private fun instanciarGson(): Gson {
-        return Gson()
     }
 
     private fun configurarBotonEliminarFiltros() {
@@ -359,7 +365,7 @@ class FiltradoActivity : AppCompatActivity() {
     // Métodos para las preferencias compartidas
     private fun guardarEstadoFiltro(filtro: Filtro) {
         val preferencias = getSharedPreferences(PREFERENCIAS_FILTRADO, Context.MODE_PRIVATE)
-        val gson = instanciarGson()
+        val gson = Gson()
         val jsonFiltro = gson.toJson(filtro)
         preferencias.edit().putString(ESTADO_FILTRO, jsonFiltro).apply()
     }

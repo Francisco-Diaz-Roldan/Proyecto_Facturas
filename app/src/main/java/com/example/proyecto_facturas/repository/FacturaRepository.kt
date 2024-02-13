@@ -21,7 +21,7 @@ class FacturaRepository @Inject constructor(
     private var retromockServiceInterface: APIRetromockServiceInterface,
     ) {
     private lateinit var servicioInterface: ServiceInterface
-    private var datos = REAL
+    private var datos = FICTICIO    //Para cambiar desde dónde se cargan los datos
 
     fun setDatos(newDatos: String){
         datos = newDatos

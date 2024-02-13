@@ -66,21 +66,19 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)// La siguiente liea es para salir de la app al darle a atrás
+        setContentView(binding.root)// La siguiente linea es para salir de la app al darle a atrás
         onBackPressedDispatcher.addCallback(this, onBackCallback)
 
+        inicializarComponentes()
+    }
+
+    private fun inicializarComponentes() {
         inicializarAdapter()
-
         inicializarViewModel()
-
         inicializarDividerDecoration()
-
         inicializarMainViewModel()
-
         configurarFacturaAdapter()
-
         configurarToolbar()
-
         inicializarintentLaunchActivityResult()
     }
 
@@ -270,53 +268,73 @@ class MainActivity : AppCompatActivity() {
     private fun comprobarEstadoPagoFiltrado(
         estado: HashMap<String, Boolean>, listaFactura: List<Factura>
     ): List<Factura> {
-        // Creo una segunda lista para devolverla despues con los datos filtrados
+        // Creo una lista para devolverla después con los datos filtrados
         val listaFiltradaPorEstado = ArrayList<Factura>()
 
-        //Declaro las checkBoxes (recibe el texto)
+        // Declaro las checkBoxes (recibe el texto)
         val chBoxPagadas = estado[PAGADAS] ?: false
         val chBoxAnuladas = estado[ANULADAS] ?: false
         val chBoxCuotaFija = estado[CUOTA_FIJA] ?: false
         val chBoxPendientesPago = estado[PENDIENTES_DE_PAGO] ?: false
         val chBoxPlanPago = estado[PLAN_DE_PAGO] ?: false
 
-        //En caso de no haber seleccionado ninguna checkbox
-        if (!chBoxPagadas && !chBoxAnuladas && !chBoxCuotaFija && !chBoxPendientesPago
-            && !chBoxPlanPago
-        ) {
+        // En caso de no haber seleccionado ninguna checkbox
+        if (!CheckBoxSeleccionado(chBoxPagadas, chBoxAnuladas, chBoxCuotaFija,
+                chBoxPendientesPago, chBoxPlanPago)) {
             return listaFactura
         }
+
         // Compruebo el estado de cada checkbox con respecto al JSON, no con respecto a
         // Strings/Constantes
         for (factura in listaFactura) {
-            val estadoFactura = factura.descEstado
-            val estaPagada = estadoFactura == "Pagada"
-            val estaAnulada = estadoFactura == "Anuladas"
-            val estaCuotaFija = estadoFactura == "cuotaFija"
-            val estaPendientePago = estadoFactura == "Pendiente de pago"
-            val estaPlanPago = estadoFactura == "Plan de Pago"
-
-            // Compruebo si el estado de la factura coincide con alguna checkbox seleccionada
-            if ((estaPagada && chBoxPagadas) || (estaAnulada && chBoxAnuladas) ||
-                (estaCuotaFija && chBoxCuotaFija) || (estaPendientePago && chBoxPendientesPago) ||
-                (estaPlanPago && chBoxPlanPago)
-            ) {
+            if (cumpleCondiciones(factura, chBoxPagadas, chBoxAnuladas, chBoxCuotaFija,
+                    chBoxPendientesPago, chBoxPlanPago)) {
                 listaFiltradaPorEstado.add(factura)
             }
         }
         return listaFiltradaPorEstado
     }
 
+    // Submétodo: Compruebo que haya al menos un CheckBox seleccionado
+    private fun CheckBoxSeleccionado(vararg checkBoxes: Boolean): Boolean {
+        return checkBoxes.any { it }
+    }
+
+    // Compruebo si el estado de la factura coincide con alguna checkbox seleccionada (compruebo el
+    // estado de cada checkbox con respecto al JSON, no con respecto a Strings/Constantes)
+    private fun cumpleCondiciones(
+        factura: Factura, chBoxPagadas: Boolean, chBoxAnuladas: Boolean, chBoxCuotaFija: Boolean,
+        chBoxPendientesPago: Boolean, chBoxPlanPago: Boolean
+    ): Boolean {
+        val estadoFactura = factura.descEstado
+        return (estadoFactura == "Pagada" && chBoxPagadas) ||
+                (estadoFactura == "Anuladas" && chBoxAnuladas) ||
+                (estadoFactura == "cuotaFija" && chBoxCuotaFija) ||
+                (estadoFactura == "Pendiente de pago" && chBoxPendientesPago) ||
+                (estadoFactura == "Plan de Pago" && chBoxPlanPago)
+    }
+
     private fun configurarToolbar() {
         val toolbar = findViewById<Toolbar>(R.id.toolbar)
         setSupportActionBar(toolbar)
+        cambiarColorToolbar(toolbar)
+        aplicarEstilosTituloToolbar()
+    }
 
+    private fun cambiarColorToolbar(toolbar: Toolbar) {
         // Cambio el color de la barra de herramientas a blanco
         toolbar.setBackgroundColor(Color.parseColor("#FFFFFFFF"))
+    }
 
-        // Creo un SpannableString para aplicar estilos al título
+    private fun aplicarEstilosTituloToolbar() {
         val spannableString = SpannableString("Facturas")
+        aplicarEstiloBold(spannableString)
+        establecerTamanoTexto(spannableString)
+        // Establezco el título de la barra de herramientas con el SpannableString
+        supportActionBar?.title = spannableString
+    }
 
+    private fun aplicarEstiloBold(spannableString: SpannableString) {
         // Aplico el estilo bold al texto
         spannableString.setSpan(
             StyleSpan(Typeface.BOLD),
@@ -324,7 +342,9 @@ class MainActivity : AppCompatActivity() {
             spannableString.length, // Fin del texto
             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
         )
+    }
 
+    private fun establecerTamanoTexto(spannableString: SpannableString) {
         // Establezco el tamaño de texto en píxeles
         val tamanoTextoEnPixeles = resources.getDimensionPixelSize(R.dimen.tamano_texto_toolbar)
         spannableString.setSpan(
@@ -333,9 +353,6 @@ class MainActivity : AppCompatActivity() {
             spannableString.length,
             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
         )
-
-        // Establezco el título de la barra de herramientas con el SpannableString
-        supportActionBar?.title = spannableString
     }
 
     private fun calcularMaximo(listaFactura: List<Factura>): Double {
