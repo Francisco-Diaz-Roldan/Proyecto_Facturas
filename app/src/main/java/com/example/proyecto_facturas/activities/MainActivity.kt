@@ -157,13 +157,13 @@ class MainActivity : AppCompatActivity() {
             if (listaCompleta.isEmpty()) {
                 viewModel.llamarApi()
             }
-            binding.switchRetromock.setOnClickListener{
+            binding.switchRetromock.setOnClickListener {
                 val isChecked = binding.switchRetromock.isChecked
-                guardarEstadoSwitch(isChecked) 
-                if(binding.switchRetromock.isChecked){
+                guardarEstadoSwitch(isChecked)
+                if (binding.switchRetromock.isChecked) {
                     viewModel.cambiarServicio(FICTICIO)
                     viewModel.llamarApi()
-                }else{
+                } else {
                     viewModel.cambiarServicio(REAL)
                     viewModel.llamarApi()
                 }
@@ -299,7 +299,10 @@ class MainActivity : AppCompatActivity() {
             // Compruebo si el estado de la factura coincide con alguna checkbox seleccionada
             if ((estaPagada && chBoxPagadas) || (estaAnulada && chBoxAnuladas) ||
                 (estaCuotaFija && chBoxCuotaFija) || (estaPendientePago && chBoxPendientesPago) ||
-                (estaPlanPago && chBoxPlanPago)) { listaFiltradaPorEstado.add(factura) }
+                (estaPlanPago && chBoxPlanPago)
+            ) {
+                listaFiltradaPorEstado.add(factura)
+            }
         }
         return listaFiltradaPorEstado
     }
@@ -405,7 +408,7 @@ class MainActivity : AppCompatActivity() {
         return null
     }
 
-    private val onBackCallback = object : OnBackPressedCallback(true){
+    private val onBackCallback = object : OnBackPressedCallback(true) {
         override fun handleOnBackPressed() {
             finishAffinity()
         }

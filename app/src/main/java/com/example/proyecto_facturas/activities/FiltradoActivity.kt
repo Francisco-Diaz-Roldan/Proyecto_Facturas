@@ -188,7 +188,8 @@ class FiltradoActivity : AppCompatActivity() {
 
     private fun inicializarPreferenciasCompartidas() {
         preferenciasCompartidas = getSharedPreferences(
-            PREFERENCIAS_FILTRADO, Context.MODE_PRIVATE)
+            PREFERENCIAS_FILTRADO, Context.MODE_PRIVATE
+        )
     }
 
     private fun configurarSeekbar() {
@@ -243,7 +244,7 @@ class FiltradoActivity : AppCompatActivity() {
 
     private fun configurarBotonAplicarFiltros() {
         binding.btnAplicar.setOnClickListener {
-            val gson = instanciarGson()
+            val gson = Gson()
             val intent = Intent(this, MainActivity::class.java)
             val estadoCheckBox = hashMapOf(
                 PAGADAS to binding.checkboxPagada.isChecked,
