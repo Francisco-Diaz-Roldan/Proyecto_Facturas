@@ -100,8 +100,7 @@ class FiltradoActivity : AppCompatActivity() {
                     if (filtroJson != null) {
                         val gson = Gson()
                         val objFiltro = gson.fromJson(filtroJson, MainActivity::class.java)
-                        val valorMax = result.data?.extras?.getDouble(Constantes.VALOR_MAX) ?: 0.0
-                    }
+                        val valorMax = result.data?.extras?.getDouble(Constantes.VALOR_MAX) ?: 0.0 }
                 }
             }
     }
@@ -123,8 +122,7 @@ class FiltradoActivity : AppCompatActivity() {
         btnHasta = binding.btnHasta
         btnHasta.setOnClickListener {
             fechaHastaSeleccionada = true
-            obtenerFecha(
-                btnHasta,
+            obtenerFecha(btnHasta,
                 restriccionFechaMin = true,
                 restriccionFechaMax = true,
                 fechaMinima = obtenerFechaDesde()
@@ -151,9 +149,7 @@ class FiltradoActivity : AppCompatActivity() {
         )
 
         // Establezco las fechas mínimas y máximas
-        restriccionFechaMin.let {
-            datePickerDialog.datePicker.minDate = fechaMinima ?: 0
-        }
+        restriccionFechaMin.let { datePickerDialog.datePicker.minDate = fechaMinima ?: 0 }
 
         restriccionFechaMax.let {
             val calendarioMax = Calendar.getInstance()
@@ -187,9 +183,7 @@ class FiltradoActivity : AppCompatActivity() {
 
 
     private fun inicializarPreferenciasCompartidas() {
-        preferenciasCompartidas = getSharedPreferences(
-            PREFERENCIAS_FILTRADO, Context.MODE_PRIVATE
-        )
+        preferenciasCompartidas = getSharedPreferences(PREFERENCIAS_FILTRADO, Context.MODE_PRIVATE)
     }
 
     private fun configurarSeekbar() {
@@ -280,9 +274,7 @@ class FiltradoActivity : AppCompatActivity() {
     }
 
     private fun configurarBotonEliminarFiltros() {
-        binding.btnEliminarFiltros.setOnClickListener {
-            resetearParametros()
-        }
+        binding.btnEliminarFiltros.setOnClickListener { resetearParametros() }
     }
 
     private fun resetearParametros() {
@@ -369,7 +361,6 @@ class FiltradoActivity : AppCompatActivity() {
         val jsonFiltro = gson.toJson(filtro)
         preferencias.edit().putString(ESTADO_FILTRO, jsonFiltro).apply()
     }
-
 
     private fun aplicarFiltrosGuardados() {
         val preferencias = getSharedPreferences((PREFERENCIAS_FILTRADO), Context.MODE_PRIVATE)

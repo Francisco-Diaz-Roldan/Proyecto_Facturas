@@ -118,11 +118,7 @@ class MainActivity : AppCompatActivity() {
         facturaAdapter.setListaFacturas(listaFiltradaGuardada ?: emptyList())
 
         this.onBackPressedDispatcher.addCallback(this, object :
-            OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                finish()
-            }
-        })
+            OnBackPressedCallback(true) { override fun handleOnBackPressed() { finish() } })
     }
 
     private fun inicializarDividerDecoration() {
@@ -152,9 +148,8 @@ class MainActivity : AppCompatActivity() {
             facturaAdapter.setListaFacturas(listaFactura)
 
             // Si la lista completa está vacía, llamo a la API para obtener datos
-            if (listaCompleta.isEmpty()) {
-                viewModel.llamarApi()
-            }
+            if (listaCompleta.isEmpty()) viewModel.llamarApi()
+
             binding.switchRetromock.setOnClickListener {
                 val isChecked = binding.switchRetromock.isChecked
                 guardarEstadoSwitch(isChecked)
@@ -251,8 +246,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun comprobarImporteFiltrado(//Para filtrar por importe
-        importe: Double, listaFactura: List<Factura>
-    ): List<Factura> {
+        importe: Double, listaFactura: List<Factura>): List<Factura> {
         // Creo una segunda lista para devolverla despues con los datos filtrados
         val listaFiltradaPorImporte = ArrayList<Factura>()
         // Si el importe de la factura es menor o igual que el seleccionado se añade a la lista
@@ -266,8 +260,7 @@ class MainActivity : AppCompatActivity() {
 
     //Para filtrar por las checkboxes (estado de pago)
     private fun comprobarEstadoPagoFiltrado(
-        estado: HashMap<String, Boolean>, listaFactura: List<Factura>
-    ): List<Factura> {
+        estado: HashMap<String, Boolean>, listaFactura: List<Factura>): List<Factura> {
         // Creo una lista para devolverla después con los datos filtrados
         val listaFiltradaPorEstado = ArrayList<Factura>()
 
@@ -279,19 +272,14 @@ class MainActivity : AppCompatActivity() {
         val chBoxPlanPago = estado[PLAN_DE_PAGO] ?: false
 
         // En caso de no haber seleccionado ninguna checkbox
-        if (!CheckBoxSeleccionado(chBoxPagadas, chBoxAnuladas, chBoxCuotaFija,
-                chBoxPendientesPago, chBoxPlanPago)) {
-            return listaFactura
-        }
+        if (!CheckBoxSeleccionado(chBoxPagadas, chBoxAnuladas, chBoxCuotaFija, chBoxPendientesPago,
+                chBoxPlanPago) ) { return listaFactura }
 
         // Compruebo el estado de cada checkbox con respecto al JSON, no con respecto a
         // Strings/Constantes
         for (factura in listaFactura) {
             if (cumpleCondiciones(factura, chBoxPagadas, chBoxAnuladas, chBoxCuotaFija,
-                    chBoxPendientesPago, chBoxPlanPago)) {
-                listaFiltradaPorEstado.add(factura)
-            }
-        }
+                    chBoxPendientesPago, chBoxPlanPago)) { listaFiltradaPorEstado.add(factura) } }
         return listaFiltradaPorEstado
     }
 
@@ -304,8 +292,7 @@ class MainActivity : AppCompatActivity() {
     // estado de cada checkbox con respecto al JSON, no con respecto a Strings/Constantes)
     private fun cumpleCondiciones(
         factura: Factura, chBoxPagadas: Boolean, chBoxAnuladas: Boolean, chBoxCuotaFija: Boolean,
-        chBoxPendientesPago: Boolean, chBoxPlanPago: Boolean
-    ): Boolean {
+        chBoxPendientesPago: Boolean, chBoxPlanPago: Boolean): Boolean {
         val estadoFactura = factura.descEstado
         return (estadoFactura == "Pagada" && chBoxPagadas) ||
                 (estadoFactura == "Anuladas" && chBoxAnuladas) ||
@@ -338,7 +325,7 @@ class MainActivity : AppCompatActivity() {
         // Aplico el estilo bold al texto
         spannableString.setSpan(
             StyleSpan(Typeface.BOLD),
-            0, // Inicio del texto
+            0, // Comienzo del texto
             spannableString.length, // Fin del texto
             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
         )
@@ -369,20 +356,13 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    private fun onItemSelected() {
-        mostrarDialogAlerta()
-    }
+    private fun onItemSelected() { mostrarDialogAlerta() }
 
     private fun mostrarDialogAlerta() {
         val builder = AlertDialog.Builder(this)
-
-        // Configuro el diálogo
         builder.setTitle("Información")
         builder.setMessage("Esta funcionalidad aún no está disponible")
-
-        // Botón negativo Cerrar
         builder.setNegativeButton("Cerrar") { dialog, which -> dialog.dismiss() }
-        // Creo y enseño el diálogo
         val alertDialog: AlertDialog = builder.create()
         alertDialog.show()
     }
@@ -391,10 +371,10 @@ class MainActivity : AppCompatActivity() {
         return when (item.itemId) {
             R.id.menuFiltrar -> {
                 val intent = Intent(this, FiltradoActivity::class.java)
-                intent.putExtra(Constantes.VALOR_MAX, valorMax)
+                intent.putExtra(VALOR_MAX, valorMax)
                 if (filtro != null) {
                     val gson = Gson()
-                    intent.putExtra(Constantes.DATOS_FILTRADOS, gson.toJson(filtro))
+                    intent.putExtra(DATOS_FILTRADOS, gson.toJson(filtro))
                 }
                 intentLaunchActivityResult.launch(intent)
                 true
@@ -414,9 +394,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun obtenerListaFiltradaDesdePreferencias(): List<Factura>? {
         val listaFiltradaJson = preferenciasCompartidas.getString(
-            Constantes.LISTA_FILTRADA,
-            null
-        )
+            Constantes.LISTA_FILTRADA, null)
         if (listaFiltradaJson != null) {
             val gson = Gson()
             val tipoLista = object : TypeToken<List<Factura>>() {}.type
